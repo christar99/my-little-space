@@ -1,18 +1,23 @@
-import Loading from 'common/Loading';
-import React, { Suspense, useState } from 'react';
+import React, { Suspense } from 'react';
 import styled from 'styled-components';
+import Loading from 'common/Loading';
+import StartMenu from 'components/units/StartMenu';
+import { useAtom } from 'jotai';
+import { startMenuToggle } from 'store';
+import Icons from 'components/units/Icons';
 
-interface ViewportTypes {
-	children: React.ReactNode;
-}
-
-export default function Viewport({ children }: ViewportTypes) {
-	const [loading, setLoading] = useState<boolean>(false);
+export default function Viewport() {
+	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
+	const handleToggle = () => {
+		setToggleOn(false);
+	};
 	return (
 		<Suspense fallback={<Loading />}>
 			<Screen>
-				<Desktop>{children}</Desktop>
-				<StartMenu></StartMenu>
+				<Desktop onClick={handleToggle}>
+					<Icons />
+				</Desktop>
+				<StartMenu />
 			</Screen>
 		</Suspense>
 	);
@@ -21,19 +26,12 @@ export default function Viewport({ children }: ViewportTypes) {
 const Screen = styled.div`
 	width: 100vw;
 	height: 100vh;
-	background-color: #000;
-	color: #fff;
-	font-size: 1rem;
 	position: relative;
+	overflow: hidden;
 `;
 
-const Desktop = styled.div``;
-
-const StartMenu = styled.div`
+const Desktop = styled.div`
 	width: 100%;
-	height: 40px;
-	background-color: #aaa;
-	position: absolute;
-	bottom: 0;
-	z-index: 101;
+	height: calc(100% - 40px);
+	background-color: #000;
 `;
