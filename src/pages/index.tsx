@@ -1,10 +1,11 @@
 import React, { Suspense } from 'react';
 import styled from 'styled-components';
-import Loading from 'common/Loading';
+import Loading from 'components/units/Loading';
 import StartMenu from 'components/units/StartMenu';
 import { useAtom } from 'jotai';
 import { startMenuToggle } from 'store';
 import Icons from 'components/units/Icons';
+import Programs from 'components/units/Programs';
 
 export default function Viewport() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
@@ -14,8 +15,9 @@ export default function Viewport() {
 	return (
 		<Suspense fallback={<Loading />}>
 			<Screen>
-				<Desktop onClick={handleToggle}>
+				<Desktop onClick={handleToggle} onMouseUp={(e) => e.preventDefault()}>
 					<Icons />
+					<Programs />
 				</Desktop>
 				<StartMenu />
 			</Screen>

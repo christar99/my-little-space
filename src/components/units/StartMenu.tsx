@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import { startMenuToggle } from 'store';
+import { changeZIndex, memorizeProgramStyle, programList, updateProgram } from 'store/programs';
+import { programType } from 'utils/type';
 import { VscSearch } from 'react-icons/vsc';
 import { FiPower } from 'react-icons/fi';
 import { SlSettings } from 'react-icons/sl';
@@ -9,19 +12,78 @@ import { IoDocumentOutline } from 'react-icons/io5';
 
 function StartMenu() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
+	const [programList, changeProgram] = useAtom(updateProgram);
+	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
+	const [memorizeList, memorizeProgram] = useAtom(memorizeProgramStyle);
+	const topProgram = useMemo(() => {
+		let result = programList[0];
+		for (let program of programList) {
+			if (program.style.zIndex > result.style.zIndex) {
+				result = program;
+			}
+		}
+		return result;
+	}, [programList]);
+
 	const handleToggle = () => {
 		setToggleOn(!toggleOn);
 	};
+
+	const handleExecuteProgram = (program: programType) => {
+		setBigZIndex();
+		if (program.style.minimization) {
+			const memorized = memorizeList.find((memorize) => program.name === memorize.name);
+			if (memorized !== undefined) {
+				changeProgram({
+					program,
+					type: 'restoration',
+					value: [
+						memorized.width,
+						memorized.height,
+						memorized.top,
+						memorized.left,
+						zIndex
+					]
+				});
+			}
+			memorizeProgram({ program, type: 'delete' });
+		} else {
+			if (topProgram.name === program.name) {
+				memorizeProgram({ program, type: 'add' });
+				changeProgram({
+					program,
+					type: 'minimize'
+				});
+			} else {
+				changeProgram({ program, type: 'zIndex', value: [zIndex] });
+			}
+		}
+	};
+
 	return (
 		<MenuContainer>
 			<StartMenuButton onClick={handleToggle}>
 				<ButtonImage />
 			</StartMenuButton>
+
 			<SearchInputContainer onClick={handleToggle}>
 				<SearchInput placeholder="찾기" />
 				<VscSearch />
 			</SearchInputContainer>
-
+			<RunningProgram>
+				{programList.map((program, index) => {
+					return (
+						<ProgmamIcon
+							key={index}
+							onClick={() => handleExecuteProgram(program)}
+							topProgram={
+								!program.style.minimization && topProgram.name === program.name
+							}>
+							<Image src={program.image} width={25} height={25} alt="program icon" />
+						</ProgmamIcon>
+					);
+				})}
+			</RunningProgram>
 			{toggleOn && (
 				<MenuToggle>
 					<SideMenu>
@@ -110,6 +172,27 @@ const SearchInput = styled.input`
 
 	:focus {
 		outline: none;
+	}
+`;
+
+const RunningProgram = styled.div`
+	display: flex;
+	gap: 2px;
+`;
+
+const ProgmamIcon = styled.div<{ topProgram: boolean }>`
+	width: 50px;
+	height: 40px;
+	padding: 0 2px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-bottom: 2px solid skyblue;
+	background-color: ${(props) => (props.topProgram ? '#444' : 'inherit')};
+
+	:hover {
+		background-color: ${(props) => (props.topProgram ? '#555' : '#333')};
+		cursor: pointer;
 	}
 `;
 
