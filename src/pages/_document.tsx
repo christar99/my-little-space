@@ -32,7 +32,12 @@ export default class document extends Document {
 	render() {
 		return (
 			<Html>
-				<Head></Head>
+				<Head>
+					<link
+						href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Nanum+Gothic&family=Nanum+Myeongjo&family=Nanum+Pen+Script&family=Noto+Serif+KR&family=Single+Day&display=swap"
+						rel="stylesheet"
+					/>
+				</Head>
 				<body>
 					<Main />
 					<NextScript />

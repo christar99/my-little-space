@@ -5,6 +5,7 @@ import { useAtom } from 'jotai';
 import { changeZIndex, exitProgram, memorizeProgramStyle, updateProgram } from 'store/programs';
 import { programType, programStyle } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
+import ProgramContent from 'components/common/ProgramContent';
 import { VscChromeMinimize } from 'react-icons/vsc';
 import { VscChromeMaximize } from 'react-icons/vsc';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -170,6 +171,7 @@ function Programs() {
 								</ControlButton>
 							</ControlGroup>
 						</TopBar>
+						<ProgramContent program={program} />
 						<SizeAdjustment
 							programStyle={program.style}
 							draggable={true}
