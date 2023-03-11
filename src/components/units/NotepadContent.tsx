@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent } from 'react';
 import styled from 'styled-components';
+import { useAtom } from 'jotai';
+import { exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { AiOutlineClose } from 'react-icons/ai';
+import { removeCookie } from 'utils/Cookie';
 
 interface NotepadContentProps {
 	program: programType;
@@ -17,6 +20,7 @@ interface fontStyleProps {
 }
 
 const settingValue: signitureIndexProps = {
+	save: '저장하기',
 	fontStyle: '글꼴',
 	fontSize: '글자 크기'
 };
@@ -27,7 +31,7 @@ const fontStyle: fontStyleProps[] = [
 	{ name: '명조', value: ['Nanum Myeongjo', 'serif'] },
 	{ name: '펜스크립트', value: ['Nanum Pen Script', 'cursive'] },
 	{ name: '싱글데이', value: ['Single Day', 'cursive'] },
-	{ name: '블랙한스', value: ['Black Han Sans', 'sans-serif'] },
+	{ name: '블랙한산스', value: ['Black Han Sans', 'sans-serif'] },
 	{ name: '주아', value: ['Jua', 'sans-serif'] }
 ];
 
@@ -36,6 +40,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 	const [modalOpen, setModalOpen] = useState<string | null>(null);
 	const [fontSize, setFontSize] = useState<number>(15);
 	const fontSizeRef = useRef<HTMLInputElement>(null);
+	const [doNotUse, closeProgram] = useAtom(exitProgram);
 	const [selectFontStyle, setFontStyle] = useState<fontStyleProps>({
 		name: '바탕',
 		value: ['Noto Serif KR', 'serif']
@@ -52,6 +57,19 @@ function NotepadContent({ program }: NotepadContentProps) {
 		setDropDownMenu(null);
 	}, [modalOpen]);
 
+	const handleCloseProgram = (program: programType) => {
+		closeProgram(program);
+		removeCookie(program.value);
+	};
+
+	const checkNumber = (e: ChangeEvent<HTMLInputElement>) => {
+		const number = e.target.value;
+		const regExp = /^[0-9]+$/;
+		if (!regExp.test(number)) {
+			alert('숫자만 입력하세요!');
+		}
+	};
+
 	const changeFontStyle = (e: ChangeEvent<HTMLSelectElement>) => {
 		const selectStyle = fontStyle.find((font) => font.value[0] === e.target.value);
 		if (selectStyle !== undefined) {
@@ -65,6 +83,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 		}
 		setModalOpen(null);
 	};
+
 	return (
 		<NotepadContainer>
 			<SettingLine>
@@ -72,6 +91,14 @@ function NotepadContent({ program }: NotepadContentProps) {
 					background={dropDownMenu === 'file'}
 					onClick={(e) => handleDropDown(e, 'file')}>
 					파일
+					{dropDownMenu === 'file' && (
+						<Dropdown>
+							<DetailMenu onClick={() => handleModalOpen('save')}>저장</DetailMenu>
+							<DetailMenu onClick={() => handleCloseProgram(program)}>
+								끝내기
+							</DetailMenu>
+						</Dropdown>
+					)}
 				</SettingMenu>
 				<SettingMenu
 					background={dropDownMenu === 'form'}
@@ -101,22 +128,27 @@ function NotepadContent({ program }: NotepadContentProps) {
 					</ModalHead>
 					<ModalContent>
 						{modalOpen === 'fontSize' && (
-							<Input ref={fontSizeRef} defaultValue={fontSize} />
+							<Input
+								ref={fontSizeRef}
+								defaultValue={fontSize}
+								onChange={(e) => checkNumber(e)}
+							/>
 						)}
 						{modalOpen === 'fontStyle' && (
 							<Select onChange={(e) => changeFontStyle(e)}>
+								<option value={fontStyle[0].value[0]}>{fontStyle[0].name}</option>
 								{fontStyle.map((font, index) => {
-									return (
-										<option
-											selected={selectFontStyle.name === font.name}
-											value={font.value[0]}
-											key={index}>
-											{font.name}
-										</option>
-									);
+									if (index > 0) {
+										return (
+											<option value={font.value[0]} key={index}>
+												{font.name}
+											</option>
+										);
+									}
 								})}
 							</Select>
 						)}
+						{modalOpen === 'save' && <Input placeholder="파일이름" />}
 						<ConfirmButton onClick={confirmSetting}>확인</ConfirmButton>
 					</ModalContent>
 				</SettingModal>
@@ -156,7 +188,7 @@ const SettingMenu = styled.div<{ background: boolean }>`
 `;
 
 const Dropdown = styled.div`
-	width: 150px;
+	width: 120px;
 	position: absolute;
 	left: 0;
 	top: 25px;
@@ -210,6 +242,12 @@ const ModalHead = styled.div`
 	align-items: center;
 	font-size: 1.4rem;
 	user-select: none;
+
+	svg {
+		:hover {
+			background-color: #f7eff2;
+		}
+	}
 `;
 
 const ModalContent = styled.div`

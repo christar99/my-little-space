@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import { iconType } from 'utils/type';
 
+export const needAccount = atom<boolean>(false);
 export const startMenuToggle = atom<boolean>(false);
 export const iconList = atom<iconType[]>([
 	{ name: '내 컴퓨터', value: 'my-computer', image: '/icons/my_pc.png', type: 'document' },
