@@ -16,8 +16,8 @@ export const executeProgram = atom(
 		const newProgram: programType = {
 			...executeValue.icon,
 			style: {
-				width: 500,
-				height: 300,
+				width: 800,
+				height: 600,
 				top: 250 + get(programList).length * 40,
 				left: 300 + get(programList).length * 40,
 				zIndex: executeValue.zIndex,
@@ -32,8 +32,8 @@ export const updateProgram = atom(
 	(get) => get(programList),
 	(get, set, changeValue: { program: programType; type: string; value?: number[] }) => {
 		let style: programStyle = {
-			width: 500,
-			height: 300,
+			width: 800,
+			height: 600,
 			top: 250 + get(programList).length * 40,
 			left: 300 + get(programList).length * 40,
 			zIndex: changeValue.value === undefined ? 101 : changeValue.value[0],
@@ -54,16 +54,16 @@ export const updateProgram = atom(
 					...changeValue.program.style,
 					width:
 						changeValue.value === undefined
-							? 500
-							: changeValue.value[0] > 300
+							? 800
+							: changeValue.value[0] > 600
 							? changeValue.value[0]
-							: 300,
+							: 600,
 					height:
 						changeValue.value === undefined
-							? 300
-							: changeValue.value[1] > 200
+							? 600
+							: changeValue.value[1] > 400
 							? changeValue.value[1]
-							: 200
+							: 400
 				};
 				break;
 			case 'locate':
@@ -82,8 +82,8 @@ export const updateProgram = atom(
 			case 'maximize':
 				style = {
 					...changeValue.program.style,
-					width: changeValue.value === undefined ? 500 : changeValue.value[0],
-					height: changeValue.value === undefined ? 300 : changeValue.value[1],
+					width: changeValue.value === undefined ? 800 : changeValue.value[0],
+					height: changeValue.value === undefined ? 600 : changeValue.value[1],
 					top: 0,
 					left: 0,
 					zIndex: changeValue.value === undefined ? 0 : changeValue.value[2],
@@ -101,8 +101,8 @@ export const updateProgram = atom(
 			case 'restoration':
 				style = {
 					...changeValue.program.style,
-					width: changeValue.value === undefined ? 500 : changeValue.value[0],
-					height: changeValue.value === undefined ? 300 : changeValue.value[1],
+					width: changeValue.value === undefined ? 800 : changeValue.value[0],
+					height: changeValue.value === undefined ? 600 : changeValue.value[1],
 					top:
 						changeValue.value === undefined
 							? 250 + get(programList).length * 40
