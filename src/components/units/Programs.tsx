@@ -23,7 +23,7 @@ function Programs() {
 	const [programList, changeProgram] = useAtom(updateProgram);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [memorizeList, memorizeProgram] = useAtom(memorizeProgramStyle);
-	const [doNotUse, closeProgram] = useAtom(exitProgram);
+	const [notUse, closeProgram] = useAtom(exitProgram);
 	const [initialPosition, setInitialPosition] = useState<{ x: number; y: number } | null>(null);
 	const [sizeAdjustStatus, setAdjustStatus] = useState<adJustStatusType>({
 		display: 'none',

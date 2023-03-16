@@ -9,20 +9,21 @@ import Programs from 'components/units/Programs';
 
 export default function Viewport() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
-	const [isLogin, setLogin] = useAtom(needAccount);
+	const [account, setLogin] = useAtom(needAccount);
 	const handleToggle = () => {
 		setToggleOn(false);
 	};
 
 	useEffect(() => {
-		if (localStorage.getItem('name') !== null) {
-			setLogin(true);
+		const loginAccount = localStorage.getItem('account');
+		if (loginAccount !== null) {
+			setLogin(loginAccount);
 		}
 	}, []);
 
 	return (
 		<>
-			{!isLogin ? (
+			{account === null ? (
 				<Login />
 			) : (
 				<Screen>

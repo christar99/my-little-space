@@ -1,17 +1,18 @@
 import React, { useState, DragEvent } from 'react';
 import Image from 'next/image';
-import styled from 'styled-components';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
 import { useAtom } from 'jotai';
 import { needAccount } from 'store';
+import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 
 function Loading() {
 	const [currentTime, notUse] = useState<dayjs.Dayjs>(dayjs());
 	const [isLogin, setLogin] = useAtom(needAccount);
-	const [account, setAccount] = useState<string>('');
+	const [userName, setUserName] = useState<string>('');
 	const [onLoginScreen, setLoginScreen] = useState<boolean>(false);
 	const handleDragScreen = (e: DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -19,13 +20,17 @@ function Loading() {
 	};
 
 	const handleSubmitID = () => {
-		if (account === '') {
+		const account = {
+			name: userName,
+			uuid: uuidv4()
+		};
+		if (userName === '') {
 			alert('로그인 할 계정을 적어주세요!');
-		} else if (account.length > 12) {
+		} else if (userName.length > 12) {
 			alert('계정은 12자 이내로 적어주세요!');
-		} else if (account !== '') {
-			localStorage.setItem('account', account);
-			setLogin(true);
+		} else if (userName !== '') {
+			localStorage.setItem('account', JSON.stringify(account));
+			setLogin(JSON.stringify(account));
 		}
 	};
 
@@ -41,7 +46,7 @@ function Loading() {
 					<Image src={'/account.png'} width={150} height={150} alt="accountImage" />
 					<Announcement>로그인계정을 입력해 주세요.</Announcement>
 					<InputContainer>
-						<Input onChange={(e) => setAccount(e.target.value)} />
+						<Input onChange={(e) => setUserName(e.target.value)} />
 						<ConfirmButton onClick={handleSubmitID}>→</ConfirmButton>
 					</InputContainer>
 				</LoginScreen>

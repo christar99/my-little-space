@@ -3,6 +3,13 @@ export interface iconType {
 	value: string;
 	image: string;
 	type: string;
+	notepadContent?: NotepadContentType;
+}
+
+interface NotepadContentType {
+	content: string;
+	fontSize: number;
+	fontStyle: string;
 }
 
 export interface programType {
@@ -11,6 +18,7 @@ export interface programType {
 	image: string;
 	type: string;
 	style: programStyle;
+	notepadContent?: NotepadContentType;
 }
 
 export interface programStyle {

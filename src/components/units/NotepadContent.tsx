@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent } from 'react';
+import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { exitProgram } from 'store/programs';
+import { iconList } from 'store';
+import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
-import { AiOutlineClose } from 'react-icons/ai';
 import { removeCookie } from 'utils/Cookie';
+import { S3Upload } from 'utils/aws';
+import { AiOutlineClose } from 'react-icons/ai';
 
 interface NotepadContentProps {
 	program: programType;
@@ -36,15 +38,27 @@ const fontStyle: fontStyleProps[] = [
 ];
 
 function NotepadContent({ program }: NotepadContentProps) {
+	const { notepadContent } = program;
+	const [zIndex] = useAtom(changeZIndex);
 	const [dropDownMenu, setDropDownMenu] = useState<string | null>(null);
 	const [modalOpen, setModalOpen] = useState<string | null>(null);
-	const [fontSize, setFontSize] = useState<number>(15);
+	const [fontSize, setFontSize] = useState<number>(
+		notepadContent === undefined ? 15 : notepadContent.fontSize
+	);
+	const [selectFontStyle, setFontStyle] = useState<fontStyleProps>(
+		notepadContent === undefined
+			? {
+					name: '바탕',
+					value: ['Noto Serif KR', 'serif']
+			  }
+			: (fontStyle.find((style) => style.name === notepadContent.fontStyle) as fontStyleProps)
+	);
 	const fontSizeRef = useRef<HTMLInputElement>(null);
-	const [doNotUse, closeProgram] = useAtom(exitProgram);
-	const [selectFontStyle, setFontStyle] = useState<fontStyleProps>({
-		name: '바탕',
-		value: ['Noto Serif KR', 'serif']
-	});
+	const textAreaRef = useRef<HTMLTextAreaElement>(null);
+	const filenameRef = useRef<HTMLInputElement>(null);
+	const [notUse, closeProgram] = useAtom(exitProgram);
+	const [notuse2, addNewIcon] = useAtom(iconList);
+
 	const handleDropDown = (e: MouseEvent, name: string | null) => {
 		e.preventDefault();
 		setDropDownMenu(name);
@@ -65,7 +79,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 	const checkNumber = (e: ChangeEvent<HTMLInputElement>) => {
 		const number = e.target.value;
 		const regExp = /^[0-9]+$/;
-		if (!regExp.test(number)) {
+		if (!regExp.test(number) && number !== '') {
 			alert('숫자만 입력하세요!');
 		}
 	};
@@ -77,9 +91,39 @@ function NotepadContent({ program }: NotepadContentProps) {
 		}
 	};
 
-	const confirmSetting = () => {
+	const confirmSetting = (program: programType) => {
 		if (modalOpen === 'fontSize' && fontSizeRef.current !== null) {
 			setFontSize(Number(fontSizeRef.current.value));
+		}
+		if (modalOpen === 'save' && textAreaRef.current !== null && filenameRef.current !== null) {
+			const textValue = textAreaRef.current.value;
+			const filenameValue = filenameRef.current.value;
+			if (filenameValue.length < 2) {
+				alert('두글자 이상 적어주세요');
+				return;
+			}
+
+			const account = JSON.parse(window.localStorage.getItem('account') as string);
+			const uploadKey = `${account.uuid}/notepad/_${selectFontStyle.name}_${fontSize}_${filenameValue}.txt`;
+			const file = new Blob([textValue], {
+				type: 'text/plain'
+			});
+
+			S3Upload(file, uploadKey);
+			addNewIcon([
+				{
+					name: filenameValue + '.txt',
+					value: 'notepad',
+					image: '/icons/notepad.png',
+					type: 'notepad',
+					notepadContent: {
+						content: textValue,
+						fontSize,
+						fontStyle: selectFontStyle.name
+					}
+				}
+			]);
+			handleCloseProgram(program);
 		}
 		setModalOpen(null);
 	};
@@ -92,10 +136,9 @@ function NotepadContent({ program }: NotepadContentProps) {
 					onClick={(e) => handleDropDown(e, 'file')}>
 					파일
 					{dropDownMenu === 'file' && (
-						<Dropdown>
-							<DetailMenu onClick={() => handleModalOpen('save')}>저장</DetailMenu>
-							<DetailMenu onClick={() => handleCloseProgram(program)}>
-								끝내기
+						<Dropdown zIndex={zIndex + 2}>
+							<DetailMenu onClick={() => handleModalOpen('save')}>
+								저장 후 끝내기
 							</DetailMenu>
 						</Dropdown>
 					)}
@@ -105,7 +148,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 					onClick={(e) => handleDropDown(e, 'form')}>
 					서식
 					{dropDownMenu === 'form' && (
-						<Dropdown>
+						<Dropdown zIndex={zIndex + 2}>
 							<DetailMenu onClick={() => handleModalOpen('fontStyle')}>
 								글꼴
 							</DetailMenu>
@@ -116,43 +159,58 @@ function NotepadContent({ program }: NotepadContentProps) {
 					)}
 				</SettingMenu>
 			</SettingLine>
-			<TextArea
-				fontSize={fontSize}
-				fontFamily={selectFontStyle}
-				onClick={(e) => handleDropDown(e, null)}></TextArea>
-			{modalOpen !== null && (
-				<SettingModal>
-					<ModalHead>
-						<span>{settingValue[modalOpen]}</span>
-						<AiOutlineClose onClick={() => setModalOpen(null)} />
-					</ModalHead>
-					<ModalContent>
-						{modalOpen === 'fontSize' && (
-							<Input
-								ref={fontSizeRef}
-								defaultValue={fontSize}
-								onChange={(e) => checkNumber(e)}
-							/>
-						)}
-						{modalOpen === 'fontStyle' && (
-							<Select onChange={(e) => changeFontStyle(e)}>
-								<option value={fontStyle[0].value[0]}>{fontStyle[0].name}</option>
-								{fontStyle.map((font, index) => {
-									if (index > 0) {
-										return (
-											<option value={font.value[0]} key={index}>
-												{font.name}
-											</option>
-										);
-									}
-								})}
-							</Select>
-						)}
-						{modalOpen === 'save' && <Input placeholder="파일이름" />}
-						<ConfirmButton onClick={confirmSetting}>확인</ConfirmButton>
-					</ModalContent>
-				</SettingModal>
-			)}
+			<TextContainer>
+				<TextArea
+					ref={textAreaRef}
+					fontSize={fontSize}
+					fontFamily={selectFontStyle}
+					onClick={(e) => handleDropDown(e, null)}
+					modalOpen={modalOpen !== null}
+					defaultValue={notepadContent?.content}
+				/>
+				{modalOpen !== null && (
+					<SettingModal zIndex={zIndex + 1}>
+						<ModalHead>
+							<span>{settingValue[modalOpen]}</span>
+							<AiOutlineClose onClick={() => setModalOpen(null)} />
+						</ModalHead>
+						<ModalContent>
+							{modalOpen === 'fontSize' && (
+								<Input
+									ref={fontSizeRef}
+									defaultValue={fontSize}
+									onChange={(e) => checkNumber(e)}
+								/>
+							)}
+							{modalOpen === 'fontStyle' && (
+								<Select onChange={(e) => changeFontStyle(e)}>
+									<option value={fontStyle[0].value[0]}>
+										{fontStyle[0].name}
+									</option>
+									{fontStyle.map((font, index) => {
+										if (index > 0) {
+											return (
+												<option value={font.value[0]} key={index}>
+													{font.name}
+												</option>
+											);
+										}
+									})}
+								</Select>
+							)}
+							{modalOpen === 'save' && (
+								<>
+									<Label>파일이름</Label>
+									<Input ref={filenameRef} placeholder="확장자빼고 적으세요" />
+								</>
+							)}
+							<ConfirmButton onClick={() => confirmSetting(program)}>
+								확인
+							</ConfirmButton>
+						</ModalContent>
+					</SettingModal>
+				)}
+			</TextContainer>
 		</NotepadContainer>
 	);
 }
@@ -187,7 +245,7 @@ const SettingMenu = styled.div<{ background: boolean }>`
 	}
 `;
 
-const Dropdown = styled.div`
+const Dropdown = styled.div<{ zIndex: number }>`
 	width: 120px;
 	position: absolute;
 	left: 0;
@@ -195,6 +253,7 @@ const Dropdown = styled.div`
 	border: 1px solid #ccc;
 	background-color: #f7eff2;
 	box-shadow: 5px 5px 5px #555;
+	z-index: ${(props) => props.zIndex};
 `;
 const DetailMenu = styled.div`
 	width: 100%;
@@ -209,28 +268,39 @@ const DetailMenu = styled.div`
 	}
 `;
 
-const TextArea = styled.textarea<{ fontSize: number; fontFamily: fontStyleProps }>`
+const TextContainer = styled.div`
 	width: 100%;
 	height: calc(100% - 25px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+`;
+
+const TextArea = styled.textarea<{
+	fontSize: number;
+	fontFamily: fontStyleProps;
+	modalOpen: boolean;
+}>`
+	width: 100%;
+	height: 100%;
 	border: none;
 	resize: none;
 	font-size: ${(props) => props.fontSize / 10 + 'rem'};
 	font-family: ${(props) => props.fontFamily.value[0] + ', ' + props.fontFamily.value[1]};
-	/* font-family: 'Single Day', cursive; */
+	opacity: ${(props) => (props.modalOpen ? 0.5 : 1)};
 
 	:focus {
 		outline: none;
 	}
 `;
 
-const SettingModal = styled.div`
-	width: 200px;
-	height: 120px;
+const SettingModal = styled.div<{ zIndex: number }>`
+	width: 300px;
+	height: 150px;
 	border: 1px solid #000;
 	position: absolute;
-	z-index: 990;
-	top: 33%;
-	left: 30%;
+	z-index: ${(props) => props.zIndex};
 `;
 
 const ModalHead = styled.div`
@@ -242,6 +312,7 @@ const ModalHead = styled.div`
 	align-items: center;
 	font-size: 1.4rem;
 	user-select: none;
+	background-color: #fff;
 
 	svg {
 		:hover {
@@ -252,14 +323,17 @@ const ModalHead = styled.div`
 
 const ModalContent = styled.div`
 	width: 100%;
-	height: calc(100% - 20px);
+	height: calc(100% - 25px);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	gap: 10px;
 	background-color: #f7eff2;
-	border-bottom: 1px solid #000;
+`;
+
+const Label = styled.label`
+	font-size: 1.3rem;
 `;
 
 const Input = styled.input`
