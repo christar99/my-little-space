@@ -5,7 +5,7 @@ import { iconList } from 'store';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
-import { S3Upload } from 'utils/aws';
+import { S3PutObject } from 'utils/aws';
 import { AiOutlineClose } from 'react-icons/ai';
 
 interface NotepadContentProps {
@@ -98,8 +98,14 @@ function NotepadContent({ program }: NotepadContentProps) {
 		if (modalOpen === 'save' && textAreaRef.current !== null && filenameRef.current !== null) {
 			const textValue = textAreaRef.current.value;
 			const filenameValue = filenameRef.current.value;
+			const reg = /[\{\}\[\]\/?,;:|\)*~`!^\+<>@\#$%&\\\=\(\'\"]/g;
+
 			if (filenameValue.length < 2) {
 				alert('두글자 이상 적어주세요');
+				return;
+			}
+			if (reg.test(filenameValue)) {
+				alert('특수문자는 언더바(_), 하이픈(-), 점(.)만 가능해요! (공백문자 불가)');
 				return;
 			}
 
@@ -109,7 +115,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 				type: 'text/plain'
 			});
 
-			S3Upload(file, uploadKey);
+			S3PutObject(file, uploadKey, 'text/plain');
 			addNewIcon([
 				{
 					name: filenameValue + '.txt',
@@ -138,7 +144,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 					{dropDownMenu === 'file' && (
 						<Dropdown zIndex={zIndex + 2}>
 							<DetailMenu onClick={() => handleModalOpen('save')}>
-								저장 후 끝내기
+								다른이름으로 저장
 							</DetailMenu>
 						</Dropdown>
 					)}

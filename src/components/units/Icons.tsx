@@ -4,19 +4,9 @@ import { useAtom } from 'jotai';
 import styled from 'styled-components';
 import { deleteProgramAtom, iconList, startMenuToggle } from 'store';
 import { executeProgram, changeZIndex, exitProgram } from 'store/programs';
-import { iconType } from 'utils/type';
+import { iconType, ListObjectProps } from 'utils/type';
 import { allCookie, setCookie, removeCookie } from 'utils/Cookie';
-import { S3DeleteObject, S3GetObject, S3ListObject } from 'utils/aws';
-
-interface ListObjectProps {
-	ChecksumAlgorithm?: string;
-	ETag: string;
-	Key: string;
-	LastModified: Date;
-	Owner?: string;
-	Size: number;
-	StorageClass: String;
-}
+import { S3DeleteObject, S3ListObject, S3GetObject } from 'utils/aws';
 
 function Icons() {
 	const [openStartMenu, setOpenStartMenu] = useAtom(startMenuToggle);
@@ -40,39 +30,64 @@ function Icons() {
 	}, []);
 
 	const getS3Objects = useCallback(async () => {
-		const s3Objects = await S3ListObject();
-		if (s3Objects === undefined || s3Objects.length === 0) {
+		const account = JSON.parse(localStorage.getItem('account') as string);
+		await S3ListObject(account.uuid);
+		const s3Objects = await S3ListObject(account.uuid);
+		const { textFile } = s3Objects;
+		const { imageFile } = s3Objects;
+
+		if (textFile === undefined && imageFile === undefined) {
 			return;
 		}
-		let promises = [];
-		let notepadContentProps = [];
-		for (let object of s3Objects as ListObjectProps[]) {
-			promises.push(S3GetObject(object?.Key));
-			notepadContentProps.push([object?.Key.split('_')]);
-		}
-		const notepadObject = await Promise.all(promises);
 
+		let promises = [];
+		let textFileOptions = [];
+		for (let file of textFile as ListObjectProps[]) {
+			promises.push(S3GetObject(file.Key));
+			const fileKey = file?.Key?.split('_');
+			textFileOptions.push({
+				name: fileKey[3],
+				fontSize: fileKey[2],
+				fontStyle: fileKey[1]
+			});
+		}
+
+		const textFileObject = await Promise.all(promises);
 		promises = [];
-		for (let object of notepadObject) {
+		for (let object of textFileObject) {
 			promises.push(object.Body?.transformToString());
 		}
-		const notepadContent = await Promise.all(promises);
 
-		let notepadProps: iconType[] = [];
-		notepadContentProps.forEach((props, index) => {
-			notepadProps.push({
-				name: props[0][3],
+		const textFileContent = await Promise.all(promises);
+
+		const notepad: iconType[] = [];
+		textFileOptions.forEach((option, index) => {
+			notepad.push({
+				name: option.name,
 				value: 'notepad',
 				image: '/icons/notepad.png',
 				type: 'notepad',
 				notepadContent: {
-					content: notepadContent[index] as string,
-					fontSize: Number(props[0][2]),
-					fontStyle: props[0][1]
+					content: textFileContent[index] as string,
+					fontSize: Number(option.fontSize),
+					fontStyle: option.fontStyle
 				}
 			});
 		});
-		addNewIcon([...notepadProps]);
+
+		const image: iconType[] = [];
+		imageFile?.forEach((img) => {
+			const imgKey = img?.Key?.split('/');
+			image.push({
+				name: imgKey !== undefined ? imgKey[3] : '',
+				value: 'image',
+				image: '/icons/window_image.png',
+				type: 'image',
+				src: (process.env.NEXT_PUBLIC_S3_IMAGE_URL as string) + img.Key
+			});
+		});
+
+		addNewIcon([...notepad, ...image]);
 	}, []);
 
 	const handleClickIcon = (e: MouseEvent<HTMLDivElement>, n: number) => {
@@ -102,17 +117,17 @@ function Icons() {
 			if (confirm('이 파일을 완전히 삭제할래요?')) {
 				let iconName =
 					icon.notepadContent === undefined
-						? ''
+						? icon.name
 						: `_${icon.notepadContent.fontStyle}_${icon.notepadContent.fontSize}_${icon.name}`;
 				const selectProgram = programList.find((program) => program.name === icon.name);
+				const account = JSON.parse(localStorage.getItem('account') as string);
+				// S3DeleteObject(`users/${account.uuid}/${icon.type}/${iconName}`);
+				S3DeleteObject(`users/${account.uuid}/${icon.type}/${iconName}`);
 				if (selectProgram !== undefined) {
 					removeCookie(icon.value);
 					closeProgram(selectProgram);
 				}
-				const account = JSON.parse(localStorage.getItem('account') as string);
-				S3DeleteObject(`users/${account.uuid}/${icon.type}/${iconName}`);
 				deleteProgram(icon);
-				alert('삭제했어요!');
 			}
 		}
 	};
@@ -130,8 +145,8 @@ function Icons() {
 						onDragEnd={(e) => removeProgram(e, icon)}>
 						<Image
 							src={icon.image}
-							width={80}
-							height={80}
+							width={60}
+							height={60}
 							alt={icon.name}
 							priority={true}
 						/>
@@ -151,19 +166,19 @@ const Desktop = styled.div`
 	flex-direction: column;
 	flex-wrap: wrap;
 	align-content: flex-start;
-	gap: 30px;
+	gap: 15px;
 	position: absolute;
 	z-index: 100;
 `;
 
 const Icon = styled.div<{ selected: boolean }>`
-	width: 100px;
-	height: 130px;
+	width: 80px;
+	height: 100px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	gap: 10px;
+	gap: 5px;
 	background: ${(props) => (props.selected ? '#3B5998' : 'none')};
 	border: ${(props) => (props.selected ? '1px dashed purple' : 'none')};
 	user-select: none;
@@ -171,11 +186,11 @@ const Icon = styled.div<{ selected: boolean }>`
 `;
 
 const IconName = styled.span`
-	width: 100px;
-	max-height: 35px;
+	width: 80px;
+	min-height: 18px;
 	display: flex;
 	justify-content: center;
-	font-size: 1.7rem;
+	font-size: 1.5rem;
 	color: #fff;
 	overflow: hidden;
 	text-overflow: ellipsis;

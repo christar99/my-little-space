@@ -4,6 +4,7 @@ export interface iconType {
 	image: string;
 	type: string;
 	notepadContent?: NotepadContentType;
+	src?: string;
 }
 
 interface NotepadContentType {
@@ -19,6 +20,7 @@ export interface programType {
 	type: string;
 	style: programStyle;
 	notepadContent?: NotepadContentType;
+	src?: string;
 }
 
 export interface programStyle {
@@ -38,4 +40,14 @@ export interface memorizedProgramStyle {
 	top: number;
 	left: number;
 	zIndex: number;
+}
+
+export interface ListObjectProps {
+	ChecksumAlgorithm?: string;
+	ETag: string;
+	Key: string;
+	LastModified: Date;
+	Owner?: string;
+	Size: number;
+	StorageClass: String;
 }

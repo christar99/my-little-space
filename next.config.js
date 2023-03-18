@@ -13,5 +13,8 @@ module.exports = {
 	},
 	compiler: {
 		styledComponents: true
+	},
+	images: {
+		domains: ['mylittlespace-s3.s3.ap-northeast-2.amazonaws.com']
 	}
 };
