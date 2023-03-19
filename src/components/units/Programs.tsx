@@ -79,7 +79,7 @@ function Programs() {
 
 	const handleCloseProgram = (program: programType) => {
 		closeProgram(program);
-		removeCookie(program.value);
+		removeCookie(program.uuid);
 	};
 
 	const sizeAdjustment = (e: MouseEvent<HTMLDivElement>, program: programType) => {

@@ -17,11 +17,10 @@ function ImageContent({ program }: ImageContentProps) {
 
 const ImageContainer = styled.div`
 	width: 100%;
-	height: calc(100% - 37px);
+	height: calc(100% - 35px);
 	display: flex;
 	justify-content: center;
 	position: relative;
-	background-color: #000;
 `;
 
 const ImgContent = styled.div<{ src: string }>`

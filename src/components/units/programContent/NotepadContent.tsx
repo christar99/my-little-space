@@ -6,6 +6,7 @@ import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
 import { S3PutObject } from 'utils/aws';
+import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
 
 interface NotepadContentProps {
@@ -73,7 +74,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 
 	const handleCloseProgram = (program: programType) => {
 		closeProgram(program);
-		removeCookie(program.value);
+		removeCookie(program.uuid);
 	};
 
 	const checkNumber = (e: ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +120,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 			addNewIcon([
 				{
 					name: filenameValue + '.txt',
-					value: 'notepad',
+					uuid: uuidv4(),
 					image: '/icons/notepad.png',
 					type: 'notepad',
 					notepadContent: {

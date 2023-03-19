@@ -2,12 +2,13 @@ import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState, useCallbac
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { programType } from 'utils/type';
-import { changeZIndex, exitProgram } from 'store/programs';
-import { S3PutObject } from 'utils/aws';
-import { AiOutlineClose } from 'react-icons/ai';
 import { iconList } from 'store';
+import { changeZIndex, exitProgram } from 'store/programs';
+import { programType } from 'utils/type';
+import { S3PutObject } from 'utils/aws';
 import { removeCookie } from 'utils/Cookie';
+import { v4 as uuidv4 } from 'uuid';
+import { AiOutlineClose } from 'react-icons/ai';
 
 interface PaintContentProps {
 	program: programType;
@@ -166,7 +167,7 @@ function PaintContent({ program }: PaintContentProps) {
 				addNewIcon([
 					{
 						name: fileName + '.png',
-						value: 'image',
+						uuid: uuidv4(),
 						image: '/icons/window_image.png',
 						type: 'image',
 						src: (process.env.NEXT_PUBLIC_S3_IMAGE_URL as string) + 'users/' + uploadKey
@@ -177,7 +178,7 @@ function PaintContent({ program }: PaintContentProps) {
 			alert('업로드를 실패했어요');
 		}
 		closeProgram(program);
-		removeCookie(program.value);
+		removeCookie(program.uuid);
 		setModalOpen(false);
 	};
 

@@ -1,6 +1,6 @@
 export interface iconType {
 	name: string;
-	value: string;
+	uuid: string;
 	image: string;
 	type: string;
 	notepadContent?: NotepadContentType;
@@ -15,7 +15,7 @@ interface NotepadContentType {
 
 export interface programType {
 	name: string;
-	value: string;
+	uuid: string;
 	image: string;
 	type: string;
 	style: programStyle;

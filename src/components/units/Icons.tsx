@@ -7,6 +7,7 @@ import { executeProgram, changeZIndex, exitProgram } from 'store/programs';
 import { iconType, ListObjectProps } from 'utils/type';
 import { allCookie, setCookie, removeCookie } from 'utils/Cookie';
 import { S3DeleteObject, S3ListObject, S3GetObject } from 'utils/aws';
+import { v4 as uuidv4 } from 'uuid';
 
 function Icons() {
 	const [openStartMenu, setOpenStartMenu] = useAtom(startMenuToggle);
@@ -16,18 +17,25 @@ function Icons() {
 	const [notUse2, deleteProgram] = useAtom(deleteProgramAtom);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [selected, setSelected] = useState<number>(0);
+	const [stanby, setStanby] = useState<boolean>(false);
 
 	useEffect(() => {
 		getS3Objects();
-		const openedProgram = allCookie();
-		for (let name in openedProgram) {
-			const icon = icons.find((icon) => icon.value === name);
-			if (icon !== undefined) {
-				setBigZIndex();
-				startProgram({ icon, zIndex });
+	}, []);
+
+	useEffect(() => {
+		if (stanby) {
+			const openedProgram = allCookie();
+			console.log(openedProgram, icons);
+			for (let name in openedProgram) {
+				const icon = icons.find((icon) => icon.uuid === name);
+				if (icon !== undefined) {
+					setBigZIndex();
+					startProgram({ icon, zIndex });
+				}
 			}
 		}
-	}, []);
+	}, [stanby]);
 
 	const getS3Objects = useCallback(async () => {
 		const account = JSON.parse(localStorage.getItem('account') as string);
@@ -61,10 +69,12 @@ function Icons() {
 		const textFileContent = await Promise.all(promises);
 
 		const notepad: iconType[] = [];
+		const cookies = Object.entries(allCookie());
 		textFileOptions.forEach((option, index) => {
+			const existenceFile = cookies.find((cookie) => cookie[1] === option.name);
 			notepad.push({
 				name: option.name,
-				value: 'notepad',
+				uuid: existenceFile === undefined ? uuidv4() : existenceFile[0],
 				image: '/icons/notepad.png',
 				type: 'notepad',
 				notepadContent: {
@@ -77,10 +87,11 @@ function Icons() {
 
 		const image: iconType[] = [];
 		imageFile?.forEach((img) => {
-			const imgKey = img?.Key?.split('/');
+			const imgKey = img?.Key?.split('/')[3];
+			const existenceFile = cookies.find((cookie) => cookie[1] === (imgKey as string));
 			image.push({
-				name: imgKey !== undefined ? imgKey[3] : '',
-				value: 'image',
+				name: imgKey as string,
+				uuid: existenceFile === undefined ? uuidv4() : existenceFile[0],
 				image: '/icons/window_image.png',
 				type: 'image',
 				src: (process.env.NEXT_PUBLIC_S3_IMAGE_URL as string) + img.Key
@@ -88,6 +99,7 @@ function Icons() {
 		});
 
 		addNewIcon([...notepad, ...image]);
+		setStanby(true);
 	}, []);
 
 	const handleClickIcon = (e: MouseEvent<HTMLDivElement>, n: number) => {
@@ -100,8 +112,8 @@ function Icons() {
 		(icon: iconType) => {
 			setSelected(0);
 			setBigZIndex();
-			if (!allCookie().hasOwnProperty(icon.value)) {
-				setCookie(icon.value, icon.type);
+			if (!allCookie().hasOwnProperty(icon.uuid)) {
+				setCookie(icon.uuid, icon.name);
 				startProgram({ icon, zIndex });
 			}
 		},
@@ -124,7 +136,7 @@ function Icons() {
 				// S3DeleteObject(`users/${account.uuid}/${icon.type}/${iconName}`);
 				S3DeleteObject(`users/${account.uuid}/${icon.type}/${iconName}`);
 				if (selectProgram !== undefined) {
-					removeCookie(icon.value);
+					removeCookie(icon.uuid);
 					closeProgram(selectProgram);
 				}
 				deleteProgram(icon);
