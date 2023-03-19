@@ -26,7 +26,6 @@ function Icons() {
 	useEffect(() => {
 		if (stanby) {
 			const openedProgram = allCookie();
-			console.log(openedProgram, icons);
 			for (let name in openedProgram) {
 				const icon = icons.find((icon) => icon.uuid === name);
 				if (icon !== undefined) {
