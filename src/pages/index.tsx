@@ -4,7 +4,7 @@ import { useAtom } from 'jotai';
 import { needAccount, startMenuToggle } from 'store';
 import Login from 'components/units/Login';
 import StartMenu from 'components/units/StartMenu';
-import Icons from 'components/units/Icons';
+import WallpaperIcons from 'components/units/WallpaperIcons';
 import Programs from 'components/units/Programs';
 
 export default function Viewport() {
@@ -28,7 +28,7 @@ export default function Viewport() {
 			) : (
 				<Screen>
 					<Desktop onClick={handleToggle} onMouseUp={(e) => e.preventDefault()}>
-						<Icons />
+						<WallpaperIcons />
 						<Programs />
 					</Desktop>
 					<StartMenu />

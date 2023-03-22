@@ -2,11 +2,12 @@ import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState, useCallbac
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { iconList } from 'store';
+import { addIconList } from 'store';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { S3PutObject } from 'utils/aws';
 import { removeCookie } from 'utils/Cookie';
+import { uuid } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
 
@@ -43,7 +44,7 @@ function PaintContent({ program }: PaintContentProps) {
 	const [isDrawingStart, setDrawingStart] = useState<boolean>(false);
 	const [canvasSize, setCanvasSize] = useState<number[]>([598, 313]);
 
-	const [notUse, addNewIcon] = useAtom(iconList);
+	const [iconList, addNewIcon] = useAtom(addIconList);
 	const [notUse2, closeProgram] = useAtom(exitProgram);
 	const [zIndex] = useAtom(changeZIndex);
 
@@ -154,10 +155,15 @@ function PaintContent({ program }: PaintContentProps) {
 			alert('특수문자는 언더바(_), 하이픈(-), 점(.)만 가능해요! (공백문자 불가)');
 			return;
 		}
+
+		if (iconList.find((icon) => icon.name === fileName + '.txt') !== undefined) {
+			alert('중복된 이름이 있습니다!');
+			return;
+		}
+
 		try {
 			if (canvasRef.current !== null) {
-				const account = JSON.parse(window.localStorage.getItem('account') as string);
-				const uploadKey = `${account.uuid}/image/${fileName}.png`;
+				const uploadKey = `${uuid}/image/${fileName}.png`;
 				canvasRef.current.toBlob((blob) => {
 					if (blob !== null) {
 						S3PutObject(blob, uploadKey, 'image/png');
@@ -170,7 +176,11 @@ function PaintContent({ program }: PaintContentProps) {
 						uuid: uuidv4(),
 						image: '/icons/window_image.png',
 						type: 'image',
-						src: (process.env.NEXT_PUBLIC_S3_IMAGE_URL as string) + 'users/' + uploadKey
+						from: 'desktop',
+						src:
+							(process.env.NEXT_PUBLIC_S3_DEFAULT_URL as string) +
+							'users/' +
+							uploadKey
 					}
 				]);
 			}
@@ -267,7 +277,7 @@ function PaintContent({ program }: PaintContentProps) {
 
 const PaintContainer = styled.div`
 	width: 100%;
-	height: calc(100% - 35px);
+	height: 100%;
 	user-select: none;
 	background-color: #aecbd6;
 	position: relative;

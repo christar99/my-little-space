@@ -3,8 +3,10 @@ export interface iconType {
 	uuid: string;
 	image: string;
 	type: string;
+	from: string;
 	notepadContent?: NotepadContentType;
 	src?: string;
+	containIcons?: iconType[];
 }
 
 interface NotepadContentType {
@@ -21,6 +23,7 @@ export interface programType {
 	style: programStyle;
 	notepadContent?: NotepadContentType;
 	src?: string;
+	containIcons?: iconType[];
 }
 
 export interface programStyle {

@@ -51,8 +51,9 @@ export const S3ListObject = async (uuid: string) => {
 	const s3Data = await s3Client.send(command);
 	const textFile = s3Data.Contents?.filter((content) => content.Key?.includes('.txt'));
 	const imageFile = s3Data.Contents?.filter((content) => content.Key?.includes('.png'));
+	const folders = s3Data.Contents?.filter((content) => content.Key?.includes('.json'));
 
-	return { textFile, imageFile };
+	return { folders, textFile, imageFile };
 };
 
 export const S3GetObject = async (downloadKey: string) => {

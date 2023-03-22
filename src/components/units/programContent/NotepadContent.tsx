@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { iconList } from 'store';
+import { addIconList } from 'store';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
 import { S3PutObject } from 'utils/aws';
+import { uuid } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
 
@@ -58,7 +59,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const filenameRef = useRef<HTMLInputElement>(null);
 	const [notUse, closeProgram] = useAtom(exitProgram);
-	const [notuse2, addNewIcon] = useAtom(iconList);
+	const [iconList, addNewIcon] = useAtom(addIconList);
 
 	const handleDropDown = (e: MouseEvent, name: string | null) => {
 		e.preventDefault();
@@ -110,8 +111,12 @@ function NotepadContent({ program }: NotepadContentProps) {
 				return;
 			}
 
-			const account = JSON.parse(window.localStorage.getItem('account') as string);
-			const uploadKey = `${account.uuid}/notepad/_${selectFontStyle.name}_${fontSize}_${filenameValue}.txt`;
+			if (iconList.find((icon) => icon.name === filenameValue + '.txt') !== undefined) {
+				alert('중복된 이름이 있습니다!');
+				return;
+			}
+
+			const uploadKey = `${uuid}/notepad/_${selectFontStyle.name}_${fontSize}_${filenameValue}.txt`;
 			const file = new Blob([textValue], {
 				type: 'text/plain'
 			});
@@ -123,6 +128,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 					uuid: uuidv4(),
 					image: '/icons/notepad.png',
 					type: 'notepad',
+                    from: 'desktop',
 					notepadContent: {
 						content: textValue,
 						fontSize,
@@ -224,12 +230,13 @@ function NotepadContent({ program }: NotepadContentProps) {
 
 const NotepadContainer = styled.div`
 	width: 100%;
-	height: calc(100% - 40px);
+	height: 100%;
 `;
 
 const SettingLine = styled.div`
 	width: 100%;
 	height: 25px;
+	background-color: #fff;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 	display: flex;
 `;

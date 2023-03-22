@@ -1,10 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo, useEffect, MouseEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { startMenuToggle } from 'store';
-import { changeZIndex, memorizeProgramStyle, programList, updateProgram } from 'store/programs';
+import { addIconList, startMenuToggle } from 'store';
+import { changeZIndex, executeProgram, memorizeProgramStyle, updateProgram } from 'store/programs';
 import { programType } from 'utils/type';
+import { allCookie, setCookie } from 'utils/Cookie';
+import { S3PutObject } from 'utils/aws';
+import { uuid } from 'utils/common';
+import { v4 as uuidv4 } from 'uuid';
 import { VscSearch } from 'react-icons/vsc';
 import { FiPower } from 'react-icons/fi';
 import { SlSettings } from 'react-icons/sl';
@@ -12,9 +16,14 @@ import { IoDocumentOutline } from 'react-icons/io5';
 
 function StartMenu() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
+	const [iconList, addNewIcon] = useAtom(addIconList);
+	const [notUse, startProgram] = useAtom(executeProgram);
 	const [programList, changeProgram] = useAtom(updateProgram);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [memorizeList, memorizeProgram] = useAtom(memorizeProgramStyle);
+	const [newFolderToggle, openNewFolderToggle] = useState<boolean>(false);
+	const [newFolderName, setNewFolderName] = useState<string>('');
+
 	const topProgram = useMemo(() => {
 		let result = programList[0];
 		for (let program of programList) {
@@ -24,6 +33,10 @@ function StartMenu() {
 		}
 		return result;
 	}, [programList]);
+
+	useEffect(() => {
+		openNewFolderToggle(false);
+	}, [toggleOn]);
 
 	const handleToggle = () => {
 		setToggleOn(!toggleOn);
@@ -60,6 +73,65 @@ function StartMenu() {
 		}
 	};
 
+	const createNewFolder = (e: MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		const reg = /[\{\}\[\]\/?,;:|\)*~`!^\+<>@\#$%&\\\=\(\'\"]/g;
+		if (newFolderName === '') {
+			alert('이름을 작성해주세요!');
+			return;
+		}
+
+		if (iconList.find((icon) => icon.name === newFolderName) !== undefined) {
+			alert('중복된 이름이 있습니다!');
+			return;
+		}
+		if (reg.test(newFolderName)) {
+			alert('특수문자는 언더바(_), 하이픈(-), 점(.)만 가능해요! (공백문자 불가)');
+			return;
+		}
+
+		const uploadKey = `${uuid}/document/${newFolderName}.json`;
+
+		const file = new Blob([], {
+			type: 'application/json'
+		});
+
+		S3PutObject(file, uploadKey, 'application/json');
+		addNewIcon([
+			{
+				name: newFolderName,
+				uuid: uuidv4(),
+				image: '/icons/newFolder.png',
+				type: 'document',
+				from: 'desktop'
+			}
+		]);
+		handleToggle();
+	};
+
+	const openMyComputer = () => {
+		setBigZIndex();
+		const setting = iconList[0];
+		if (!allCookie().hasOwnProperty(setting.uuid)) {
+			setCookie(setting.uuid, setting.name);
+			startProgram({ icon: setting, zIndex });
+		} else {
+			const settingProgram = programList.find((program) => program.name === setting.name);
+			changeProgram({
+				program: settingProgram as programType,
+				type: 'zIndex',
+				value: [zIndex]
+			});
+		}
+		setToggleOn(false);
+	};
+
+	const handleClose = () => {
+		if (confirm('정말 종료하시겠습니까?')) {
+			window.close();
+		}
+	};
+
 	return (
 		<MenuContainer>
 			<StartMenuButton onClick={handleToggle}>
@@ -87,13 +159,27 @@ function StartMenu() {
 			{toggleOn && (
 				<MenuToggle>
 					<SideMenu>
-						<SideMenuButton title="문서">
+						<SideMenuButton
+							title="새 폴더"
+							onClick={() => openNewFolderToggle(!newFolderToggle)}>
 							<IoDocumentOutline />
+							{newFolderToggle && (
+								<CreateNewFolder>
+									<NewFolderInput
+										placeholder="새폴더 이름"
+										onClick={(e) => e.stopPropagation()}
+										onChange={(e) => setNewFolderName(e.target.value)}
+									/>
+									<ConfirmButton onClick={(e) => createNewFolder(e)}>
+										확인
+									</ConfirmButton>
+								</CreateNewFolder>
+							)}
 						</SideMenuButton>
-						<SideMenuButton title="설정">
+						<SideMenuButton title="내컴퓨터 설정" onClick={openMyComputer}>
 							<SlSettings />
 						</SideMenuButton>
-						<SideMenuButton title="종료">
+						<SideMenuButton title="종료" onClick={handleClose}>
 							<FiPower />
 						</SideMenuButton>
 					</SideMenu>
@@ -224,9 +310,56 @@ const SideMenuButton = styled.div`
 	justify-content: center;
 	align-items: center;
 	font-size: 2rem;
+	position: relative;
 
 	:hover {
 		background-color: #2d2d2d;
+		cursor: pointer;
+	}
+`;
+
+const CreateNewFolder = styled.div`
+	width: 250px;
+	height: 48px;
+	background-color: #333;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	gap: 10px;
+	left: 48px;
+`;
+
+const NewFolderInput = styled.input`
+	width: 180px;
+	height: 30px;
+	padding: 0 5px;
+	font-size: 1.5rem;
+	background-color: #aaa;
+	border: none;
+
+	::placeholder {
+		color: #222;
+	}
+
+	:focus {
+		outline: none;
+	}
+`;
+
+const ConfirmButton = styled.button`
+	width: 50px;
+	height: 30px;
+	border: none;
+	font-size: 1.4rem;
+	font-weight: 700;
+	background-color: #ddd;
+
+	:focus {
+		background-color: #bbb;
+	}
+
+	:hover {
 		cursor: pointer;
 	}
 `;
