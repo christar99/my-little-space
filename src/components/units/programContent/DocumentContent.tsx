@@ -18,7 +18,10 @@ function DocumentContent({ program }: DocumentContentProps) {
 	}, [iconList]);
 
 	return (
-		<DocumentContainer onClick={() => setSelected('')}>
+		<DocumentContainer
+			onClick={() => setSelected('')}
+			data-type={'document'}
+			data-name={program.name}>
 			{currentProgram?.containIcons === undefined ? (
 				<NoContent>이 폴더는 비어 있습니다.</NoContent>
 			) : (
@@ -32,7 +35,7 @@ function DocumentContent({ program }: DocumentContentProps) {
 
 const DocumentContainer = styled.div`
 	width: 100%;
-	height: calc(100% - 38px);
+	height: 100%;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 20px;
