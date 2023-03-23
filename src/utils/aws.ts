@@ -17,12 +17,14 @@ const s3Client = new S3Client({
 	region: 'ap-northeast-2'
 });
 
-export const S3DeleteObject = async (key: string) => {
+export const S3DeleteObject = async (key: { Key: string }[]) => {
 	const params = {
 		Bucket,
-		Key: key
+		Delete: {
+			Objects: key
+		}
 	};
-	await S3.deleteObject(params, (err) => {
+	await S3.deleteObjects(params, (err) => {
 		if (err) console.log(err, err.stack);
 		else alert('삭제했어요!');
 	});

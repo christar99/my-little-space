@@ -4,7 +4,7 @@ import { iconType } from 'utils/type';
 
 export const needAccount = atom<string | null>(null);
 export const startMenuToggle = atom<boolean>(false);
-const iconListAtom = atom<iconType[]>(initialIcon);
+export const iconListAtom = atom<iconType[]>(initialIcon);
 
 export const addIconList = atom(
 	(get) => get(iconListAtom),
@@ -35,5 +35,13 @@ export const selectedIcon = atom(
 	(get) => get(selected),
 	(get, set, name: string) => {
 		set(selected, name);
+	}
+);
+
+const color = atom<string>('#000000');
+export const colorAtom = atom(
+	(get) => get(color),
+	(get, set, code: string) => {
+		set(color, code);
 	}
 );

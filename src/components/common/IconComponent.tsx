@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react';
+import React, { useState, MouseEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
@@ -37,7 +37,6 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 	};
 
 	const handleOpenProgram = () => {
-		console.log(icon);
 		setSelected('');
 		setBigZIndex();
 		if (!allCookie().hasOwnProperty(icon.uuid)) {
@@ -49,13 +48,13 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		const destination = document.elementFromPoint(e.clientX, e.clientY);
 		const folderName = destination?.getAttribute('data-name') as string;
 		const dataType = destination?.getAttribute('data-type');
-		let iconObj = iconList.find((item) => item.name === folderName) as iconType;
+		const folderIcon = iconList.find((item) => item.name === folderName) as iconType;
 
 		if (dataType === 'trash_can') {
 			handleDeleteProgram();
 		} else if (dataType === 'document') {
-			moveToDocument(folderName, iconObj);
-		} else if (dataType === 'desktop' && iconObj === undefined) {
+			moveToDocument(folderName, folderIcon);
+		} else if (dataType === 'desktop' && folderIcon === undefined) {
 			moveToDeskTop();
 		}
 	};
@@ -66,26 +65,42 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 			return;
 		}
 		if (confirm('이 파일을 완전히 삭제할래요?')) {
-			let deleteIconName = '';
-			deleteIconName =
-				icon.notepadContent === undefined
-					? icon.name
-					: `_${icon.notepadContent.fontStyle}_${icon.notepadContent.fontSize}_${icon.name}`;
+			const deleteKey = [];
 			if (icon.type === 'document') {
-				deleteIconName += '.json';
+				icon?.containIcons?.forEach((containIcon) => {
+					deleteKey.push(deleteDetail(containIcon));
+				});
 			}
-			const selectProgram = programList.find((program) => program.name === icon.name);
-			const account = JSON.parse(localStorage.getItem('account') as string);
-			S3DeleteObject(`users/${account.uuid}/${icon.type}/${deleteIconName}`);
-			if (selectProgram !== undefined) {
-				removeCookie(icon.uuid);
-				closeProgram(selectProgram);
-			}
-			deleteProgram(icon);
+			deleteKey.push(deleteDetail(icon));
+			S3DeleteObject(deleteKey);
 		}
 	};
 
-	const moveToDocument = (folderName: string, iconObj: iconType) => {
+	const deleteDetail = (iconObj: iconType) => {
+		let deleteIconName = '';
+		if (iconObj.type === 'document') {
+			deleteIconName = iconObj.name + '.json';
+		} else if (iconObj.type === 'notepad') {
+			deleteIconName = `_${iconObj.notepadContent?.fontStyle}_${iconObj.notepadContent?.fontSize}_${iconObj.name}`;
+		} else {
+			deleteIconName = iconObj.name;
+		}
+		const selectProgram = programList.find((program) => program.name === iconObj.name);
+		if (selectProgram !== undefined) {
+			removeCookie(iconObj.uuid);
+			closeProgram(selectProgram);
+		}
+		const key = { Key: `users/${uuid}/${iconObj.type}/${deleteIconName}` };
+		deleteProgram(iconObj);
+
+		return key;
+	};
+
+	const moveToDocument = (folderName: string, folderIcon: iconType) => {
+		if (icon.type === 'document') {
+			alert('폴더는 다른 폴더 안으로 이동 못해요');
+			return;
+		}
 		if (folderName === '내 컴퓨터') {
 			return;
 		}
@@ -93,7 +108,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 			alert('기본 프로그램은 폴더에 못넣어요!');
 			return;
 		}
-		let cloneFolder = structuredClone(iconObj);
+		let cloneFolder = structuredClone(folderIcon);
 		if (cloneFolder.containIcons === undefined) {
 			cloneFolder.containIcons = [];
 		}
@@ -156,7 +171,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 					height={60}
 					priority={true}
 					alt={icon.name}
-                    data-name={icon.name}
+					data-name={icon.name}
 					data-type={icon.type}
 				/>
 				<IconName from={from}>{icon.name}</IconName>

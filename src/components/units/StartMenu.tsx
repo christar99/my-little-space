@@ -91,8 +91,8 @@ function StartMenu() {
 		}
 
 		const uploadKey = `${uuid}/document/${newFolderName}.json`;
-
-		const file = new Blob([], {
+		const bytes = new TextEncoder().encode('[]');
+		const file = new Blob([bytes], {
 			type: 'application/json'
 		});
 
