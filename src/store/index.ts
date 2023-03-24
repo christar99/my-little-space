@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { initialIcon } from 'utils/common';
-import { iconType } from 'utils/type';
+import { backgroundType, iconType } from 'utils/type';
 
 export const needAccount = atom<string | null>(null);
 export const startMenuToggle = atom<boolean>(false);
@@ -38,10 +38,21 @@ export const selectedIcon = atom(
 	}
 );
 
-const color = atom<string>('#000000');
-export const colorAtom = atom(
-	(get) => get(color),
-	(get, set, code: string) => {
-		set(color, code);
+const background = atom<backgroundType>({
+	type: 'color',
+	value: '#000000'
+});
+export const backgroundAtom = atom(
+	(get) => get(background),
+	(get, set, result: backgroundType) => {
+		set(background, result);
+	}
+);
+
+const screenShot = atom<string>('');
+export const screenShotAtom = atom(
+	(get) => get(screenShot),
+	(get, set, src: string) => {
+		set(screenShot, src);
 	}
 );

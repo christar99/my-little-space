@@ -4,6 +4,7 @@ import NotepadContent from 'components/units/programContent/NotepadContent';
 import PaintContent from 'components/units/programContent/PaintContent';
 import ImageContent from 'components/units/programContent/ImageContent';
 import DocumentContent from 'components/units/programContent/DocumentContent';
+import BackgroundImage from 'components/units/programContent/BackgroundSetting';
 import styled from 'styled-components';
 
 interface ProgramContentProps {
@@ -17,6 +18,7 @@ function ProgramContent({ program }: ProgramContentProps) {
 			{program.type === 'paint' && <PaintContent program={program} />}
 			{program.type === 'image' && <ImageContent program={program} />}
 			{program.type === 'document' && <DocumentContent program={program} />}
+			{program.name === '배경화면 설정' && <BackgroundImage program={program} />}
 		</ProgramBackground>
 	);
 }

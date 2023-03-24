@@ -73,6 +73,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 			}
 			deleteKey.push(deleteDetail(icon));
 			S3DeleteObject(deleteKey);
+			alert('삭제했어요!');
 		}
 	};
 
@@ -169,7 +170,6 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 					src={icon.image}
 					width={60}
 					height={60}
-					priority={true}
 					alt={icon.name}
 					data-name={icon.name}
 					data-type={icon.type}

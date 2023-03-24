@@ -7,28 +7,13 @@ import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { S3PutObject } from 'utils/aws';
 import { removeCookie } from 'utils/Cookie';
-import { uuid } from 'utils/common';
+import { colors, uuid } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
 
 interface PaintContentProps {
 	program: programType;
 }
-
-const colors = [
-	{ code: '#000000' },
-	{ code: '#1abc9c' },
-	{ code: '#3498db' },
-	{ code: '#0400ff' },
-	{ code: '#27ae60' },
-	{ code: '#8e44ad' },
-	{ code: '#f1da0f' },
-	{ code: '#e74c3c' },
-	{ code: '#95a5a6' },
-	{ code: '#5c2a09' },
-	{ code: '#c9cfd3' },
-	{ code: '#ff0000' }
-];
 
 function PaintContent({ program }: PaintContentProps) {
 	const { style } = program;
@@ -47,6 +32,7 @@ function PaintContent({ program }: PaintContentProps) {
 	const [iconList, addNewIcon] = useAtom(addIconList);
 	const [notUse2, closeProgram] = useAtom(exitProgram);
 	const [zIndex] = useAtom(changeZIndex);
+	const fileNameRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (canvasRef.current !== null) {
@@ -83,6 +69,8 @@ function PaintContent({ program }: PaintContentProps) {
 	useEffect(() => {
 		if (!modalOpen) {
 			setFileName('');
+		} else {
+			fileNameRef.current?.focus();
 		}
 	}, [modalOpen]);
 
@@ -255,6 +243,7 @@ function PaintContent({ program }: PaintContentProps) {
 						</ModalHeader>
 						<ModalContent>
 							<SaveInput
+								ref={fileNameRef}
 								onChange={(e) => setFileName(e.currentTarget.value)}
 								placeholder="확장자 빼고 적으세요."
 							/>

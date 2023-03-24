@@ -54,3 +54,8 @@ export interface ListObjectProps {
 	Size: number;
 	StorageClass: String;
 }
+
+export interface backgroundType {
+	type: string;
+	value: string;
+}

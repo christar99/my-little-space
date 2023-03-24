@@ -1,6 +1,6 @@
 const account =
 	typeof window === 'undefined' ? undefined : (window.localStorage.getItem('account') as string);
-export const uuid = typeof account === 'undefined' ? '' : JSON.parse(account).uuid;
+export const uuid = account === null || account === undefined ? '' : JSON.parse(account).uuid;
 
 export const fetchURL = async (url: string) => {
 	try {
@@ -27,23 +27,9 @@ export const initialIcon = [
 				from: '내 컴퓨터'
 			},
 			{
-				name: '배 설정',
+				name: '테마 설정',
 				uuid: 'fee019d3-1196-4cb2-b82c-47d57f2b1952',
-				image: '/icons/background_image.png',
-				type: 'setting',
-				from: '내 컴퓨터'
-			},
-			{
-				name: '배면 설정',
-				uuid: 'fee019d3-1196-4cb2-b82c-47d57f2b1952',
-				image: '/icons/background_image.png',
-				type: 'setting',
-				from: '내 컴퓨터'
-			},
-			{
-				name: '배경화',
-				uuid: 'fee019d3-1196-4cb2-b82c-47d57f2b1952',
-				image: '/icons/background_image.png',
+				image: '/icons/colorTheme.png',
 				type: 'setting',
 				from: '내 컴퓨터'
 			}
@@ -70,4 +56,19 @@ export const initialIcon = [
 		type: 'paint',
 		from: 'desktop'
 	}
+];
+
+export const colors = [
+	{ code: '#000000' },
+	{ code: '#1abc9c' },
+	{ code: '#3498db' },
+	{ code: '#0400ff' },
+	{ code: '#27ae60' },
+	{ code: '#8e44ad' },
+	{ code: '#f1da0f' },
+	{ code: '#e74c3c' },
+	{ code: '#c037b5' },
+	{ code: '#5c2a09' },
+	{ code: '#c9cfd3' },
+	{ code: '#ff0000' }
 ];

@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import styled from 'styled-components';
-import { addIconList, selectedIcon, startMenuToggle } from 'store';
+import { addIconList, backgroundAtom, screenShotAtom, selectedIcon, startMenuToggle } from 'store';
 import { executeProgram, changeZIndex } from 'store/programs';
-import { iconType, ListObjectProps } from 'utils/type';
+import { backgroundType, iconType, ListObjectProps } from 'utils/type';
 import { S3ListObject, S3GetObject } from 'utils/aws';
 import { allCookie } from 'utils/Cookie';
 import { fetchURL, uuid } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import IconComponent from 'components/common/IconComponent';
 import { _Object } from '@aws-sdk/client-s3';
+import html2canvas from 'html2canvas';
 
 export default function WallpaperIcons() {
 	const [openStartMenu, setOpenStartMenu] = useAtom(startMenuToggle);
@@ -18,9 +19,16 @@ export default function WallpaperIcons() {
 	const [notUse2, setSelected] = useAtom(selectedIcon);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [stanby, setStanby] = useState<boolean>(false);
+	const desktopRef = useRef<HTMLDivElement>(null);
+	const [background, setBackground] = useAtom(backgroundAtom);
+	const [notuse3, setScreenShot] = useAtom(screenShotAtom);
 
 	useEffect(() => {
 		getS3Objects();
+		const savedBackground = localStorage.getItem('background');
+		if (savedBackground !== null) {
+			setBackground(JSON.parse(savedBackground));
+		}
 	}, []);
 
 	useEffect(() => {
@@ -36,16 +44,45 @@ export default function WallpaperIcons() {
 		}
 	}, [stanby]);
 
+	useEffect(() => {
+		getScreenshot();
+	}, [background]);
+
+	const getScreenshot = async () => {
+		if (background.type === 'color' && desktopRef.current !== null) {
+			const canvas = await html2canvas(desktopRef.current);
+			const imageData = canvas.toDataURL('image/png');
+			setScreenShot(imageData);
+		}
+	};
+
 	const getS3Objects = useCallback(async () => {
 		await S3ListObject(uuid);
 		const s3Objects = await S3ListObject(uuid);
-		const { textFile, imageFile, folders } = s3Objects;
+		const { textFile, imageFile, folders, background } = s3Objects;
 
-		if (textFile === undefined && imageFile === undefined && folders === undefined) {
+		if (
+			textFile.length === 0 &&
+			imageFile.length === 0 &&
+			folders.length === 0 &&
+			background === undefined
+		) {
 			return;
 		}
 
+		getBackgroundImage(background);
+
 		const cookies = Object.entries(allCookie());
+		const folderList = await createFolders(cookies, folders);
+		const textFileList = await createTextFile(cookies, textFile, folderList.allDocumentFile);
+		const imageFileList = await createImageFile(cookies, imageFile, folderList.allDocumentFile);
+
+		addNewIcon([...folderList.document, ...textFileList, ...imageFileList]);
+		setStanby(true);
+	}, []);
+
+	const createFolders = async (cookies: [string, unknown][], folders: _Object[]) => {
+		let allDocumentFile: iconType[] = [];
 		let promises = [];
 
 		for (let folder of folders as _Object[]) {
@@ -56,7 +93,6 @@ export default function WallpaperIcons() {
 		promises = [];
 
 		const document: iconType[] = [];
-		let allDocumentFile: iconType[] = [];
 		folders?.forEach((folder, index) => {
 			const folderName = folder.Key?.split('/')[3].split('.')[0] as string;
 			const existenceFile = cookies.find((cookie) => cookie[1] === folderName);
@@ -71,8 +107,16 @@ export default function WallpaperIcons() {
 			document.push(documentContent);
 			allDocumentFile = [...allDocumentFile, ...documentFetch[index]];
 		});
+		return { document, allDocumentFile };
+	};
 
+	const createTextFile = async (
+		cookies: [string, unknown][],
+		textFile: _Object[],
+		allDocumentFile: iconType[]
+	) => {
 		let textFileOptions = [];
+		let promises = [];
 		for (let file of textFile as ListObjectProps[]) {
 			promises.push(S3GetObject(file.Key));
 			const fileKey = file?.Key?.split('_');
@@ -110,7 +154,14 @@ export default function WallpaperIcons() {
 				notepad.push(txtFile);
 			}
 		});
+		return notepad;
+	};
 
+	const createImageFile = (
+		cookies: [string, unknown][],
+		imageFile: _Object[],
+		allDocumentFile: iconType[]
+	) => {
 		const image: iconType[] = [];
 		imageFile?.forEach((img) => {
 			const imgKey = img?.Key?.split('/')[3] as string;
@@ -127,10 +178,14 @@ export default function WallpaperIcons() {
 				image.push(imgFile);
 			}
 		});
+		return image;
+	};
 
-		addNewIcon([...notepad, ...image, ...document]);
-		setStanby(true);
-	}, []);
+	const getBackgroundImage = (background?: _Object) => {
+		const imgSrc = (process.env.NEXT_PUBLIC_S3_DEFAULT_URL as string) + background?.Key;
+		setScreenShot(imgSrc);
+		setBackground({ type: 'image', value: imgSrc });
+	};
 
 	const handleClickIcon = () => {
 		setSelected('');
@@ -138,7 +193,11 @@ export default function WallpaperIcons() {
 	};
 
 	return (
-		<Desktop onClick={handleClickIcon} data-type={'desktop'}>
+		<Desktop
+			ref={desktopRef}
+			background={background}
+			onClick={handleClickIcon}
+			data-type={'desktop'}>
 			{icons.map((icon, index) => {
 				return <IconComponent key={index} icon={icon} from="wallpaper" />;
 			})}
@@ -146,7 +205,7 @@ export default function WallpaperIcons() {
 	);
 }
 
-const Desktop = styled.div`
+const Desktop = styled.div<{ background: backgroundType }>`
 	width: 100%;
 	height: calc(100% - 40px);
 	padding: 50px;
@@ -157,4 +216,10 @@ const Desktop = styled.div`
 	gap: 15px;
 	position: absolute;
 	z-index: 100;
+	background: ${(props) =>
+		props.background.type === 'color'
+			? props.background.value
+			: `url(${props.background.value})`};
+	background-position: center center;
+	background-repeat: no-repeat;
 `;

@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, ListObjectsV2Command, GetObjectCommand, _Object } from '@aws-sdk/client-s3';
 import AWS from 'aws-sdk';
 
 AWS.config.update({
@@ -26,7 +26,6 @@ export const S3DeleteObject = async (key: { Key: string }[]) => {
 	};
 	await S3.deleteObjects(params, (err) => {
 		if (err) console.log(err, err.stack);
-		else alert('삭제했어요!');
 	});
 };
 
@@ -51,11 +50,23 @@ export const S3ListObject = async (uuid: string) => {
 
 	const command = new ListObjectsV2Command(params);
 	const s3Data = await s3Client.send(command);
-	const textFile = s3Data.Contents?.filter((content) => content.Key?.includes('.txt'));
-	const imageFile = s3Data.Contents?.filter((content) => content.Key?.includes('.png'));
-	const folders = s3Data.Contents?.filter((content) => content.Key?.includes('.json'));
+	let textFile: _Object[] = [];
+	let imageFile: _Object[] = [];
+	let folders: _Object[] = [];
+	let background;
+	s3Data.Contents?.forEach((content) => {
+		if (content.Key?.includes('.txt')) {
+			textFile.push(content);
+		} else if (content.Key?.includes('.png') && !content.Key?.includes('mls_background')) {
+			imageFile.push(content);
+		} else if (content.Key?.includes('.json')) {
+			folders.push(content);
+		} else if (content.Key?.includes('mls_background')) {
+			background = content;
+		}
+	});
 
-	return { folders, textFile, imageFile };
+	return { folders, textFile, imageFile, background };
 };
 
 export const S3GetObject = async (downloadKey: string) => {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, MouseEvent } from 'react';
+import React, { useState, useMemo, useEffect, MouseEvent, useRef } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
@@ -23,6 +23,7 @@ function StartMenu() {
 	const [memorizeList, memorizeProgram] = useAtom(memorizeProgramStyle);
 	const [newFolderToggle, openNewFolderToggle] = useState<boolean>(false);
 	const [newFolderName, setNewFolderName] = useState<string>('');
+	const newFolderRef = useRef<HTMLInputElement>(null);
 
 	const topProgram = useMemo(() => {
 		let result = programList[0];
@@ -37,6 +38,12 @@ function StartMenu() {
 	useEffect(() => {
 		openNewFolderToggle(false);
 	}, [toggleOn]);
+
+	useEffect(() => {
+		if (newFolderToggle) {
+			newFolderRef.current?.focus();
+		}
+	}, [newFolderToggle]);
 
 	const handleToggle = () => {
 		setToggleOn(!toggleOn);
@@ -166,6 +173,7 @@ function StartMenu() {
 							{newFolderToggle && (
 								<CreateNewFolder>
 									<NewFolderInput
+										ref={newFolderRef}
 										placeholder="새폴더 이름"
 										onClick={(e) => e.stopPropagation()}
 										onChange={(e) => setNewFolderName(e.target.value)}

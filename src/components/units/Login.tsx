@@ -10,7 +10,7 @@ import 'dayjs/locale/ko';
 dayjs.locale('ko');
 
 function Loading() {
-	const [currentTime, notUse] = useState<dayjs.Dayjs>(dayjs());
+	const [currentTime] = useState<dayjs.Dayjs>(dayjs());
 	const [isLogin, setLogin] = useAtom(needAccount);
 	const [userName, setUserName] = useState<string>('');
 	const [onLoginScreen, setLoginScreen] = useState<boolean>(false);

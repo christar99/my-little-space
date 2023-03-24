@@ -61,6 +61,15 @@ function NotepadContent({ program }: NotepadContentProps) {
 	const [notUse, closeProgram] = useAtom(exitProgram);
 	const [iconList, addNewIcon] = useAtom(addIconList);
 
+	useEffect(() => {
+		setDropDownMenu(null);
+		if (modalOpen === 'fontSize') {
+			fontSizeRef.current?.focus();
+		} else if (modalOpen === 'save') {
+			filenameRef.current?.focus();
+		}
+	}, [modalOpen]);
+
 	const handleDropDown = (e: MouseEvent, name: string | null) => {
 		e.preventDefault();
 		setDropDownMenu(name);
@@ -68,10 +77,6 @@ function NotepadContent({ program }: NotepadContentProps) {
 	const handleModalOpen = (name: string) => {
 		setModalOpen(name);
 	};
-
-	useEffect(() => {
-		setDropDownMenu(null);
-	}, [modalOpen]);
 
 	const handleCloseProgram = (program: programType) => {
 		closeProgram(program);
@@ -128,7 +133,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 					uuid: uuidv4(),
 					image: '/icons/notepad.png',
 					type: 'notepad',
-                    from: 'desktop',
+					from: 'desktop',
 					notepadContent: {
 						content: textValue,
 						fontSize,

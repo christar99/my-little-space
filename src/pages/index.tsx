@@ -10,6 +10,7 @@ import Programs from 'components/units/Programs';
 export default function Viewport() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
 	const [account, setLogin] = useAtom(needAccount);
+
 	const handleToggle = () => {
 		setToggleOn(false);
 	};
@@ -48,5 +49,4 @@ const Screen = styled.div`
 const Desktop = styled.div`
 	width: 100%;
 	height: calc(100% - 40px);
-	background-color: #000;
 `;
