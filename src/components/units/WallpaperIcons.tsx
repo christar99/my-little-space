@@ -16,7 +16,7 @@ export default function WallpaperIcons() {
 	const [openStartMenu, setOpenStartMenu] = useAtom(startMenuToggle);
 	const [icons, addNewIcon] = useAtom(addIconList);
 	const [notuse, startProgram] = useAtom(executeProgram);
-	const [notUse2, setSelected] = useAtom(selectedIcon);
+	const [notuse2, setSelected] = useAtom(selectedIcon);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [stanby, setStanby] = useState<boolean>(false);
 	const desktopRef = useRef<HTMLDivElement>(null);
@@ -24,11 +24,12 @@ export default function WallpaperIcons() {
 	const [notuse3, setScreenShot] = useAtom(screenShotAtom);
 
 	useEffect(() => {
-		getS3Objects();
 		const savedBackground = localStorage.getItem('background');
 		if (savedBackground !== null) {
 			setBackground(JSON.parse(savedBackground));
 		}
+		getS3Objects();
+		startDefaultFile();
 	}, []);
 
 	useEffect(() => {
@@ -183,8 +184,27 @@ export default function WallpaperIcons() {
 
 	const getBackgroundImage = (background?: _Object) => {
 		const imgSrc = (process.env.NEXT_PUBLIC_S3_DEFAULT_URL as string) + background?.Key;
-		setScreenShot(imgSrc);
 		setBackground({ type: 'image', value: imgSrc });
+		setTimeout(() => {
+			setScreenShot(imgSrc);
+		}, 1000);
+	};
+
+	const startDefaultFile = () => {
+		const cookies = Object.values(allCookie());
+		icons.forEach((icon) => {
+			if (cookies.includes(icon.name)) {
+				setBigZIndex();
+				startProgram({ icon, zIndex });
+			}
+		});
+		const settingProgram = icons.find((icon) => icon.name === '내 컴퓨터')?.containIcons;
+		settingProgram?.forEach((icon) => {
+			if (cookies.includes(icon.name)) {
+				setBigZIndex();
+				startProgram({ icon, zIndex });
+			}
+		});
 	};
 
 	const handleClickIcon = () => {
