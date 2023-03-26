@@ -62,21 +62,20 @@ export default function WallpaperIcons() {
 		const s3Objects = await S3ListObject(uuid);
 		const { textFile, imageFile, folders, background } = s3Objects;
 
-		if (
-			textFile.length === 0 &&
-			imageFile.length === 0 &&
-			folders.length === 0 &&
-			background === undefined
-		) {
-			return;
+		if (background !== undefined) {
+			getBackgroundImage(background);
 		}
-
-		getBackgroundImage(background);
 
 		const cookies = Object.entries(allCookie());
 		const folderList = await createFolders(cookies, folders);
-		const textFileList = await createTextFile(cookies, textFile, folderList.allDocumentFile);
-		const imageFileList = await createImageFile(cookies, imageFile, folderList.allDocumentFile);
+		let textFileList: iconType[] = [];
+		let imageFileList: iconType[] = [];
+		if (textFile.length > 0) {
+			textFileList = await createTextFile(cookies, textFile, folderList.allDocumentFile);
+		}
+		if (imageFileList.length > 0) {
+			imageFileList = await createImageFile(cookies, imageFile, folderList.allDocumentFile);
+		}
 
 		addNewIcon([...folderList.document, ...textFileList, ...imageFileList]);
 		setStanby(true);

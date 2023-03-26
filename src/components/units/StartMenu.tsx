@@ -200,7 +200,7 @@ function StartMenu() {
 const MenuContainer = styled.div`
 	width: 100%;
 	height: 40px;
-	background-color: #222;
+	background-color: ${(props) => props.theme.startMenu.menuContainer};
 	position: absolute;
 	bottom: 0;
 	z-index: 101;
@@ -215,7 +215,7 @@ const StartMenuButton = styled.div`
 	align-items: center;
 
 	:hover {
-		background: #111;
+		background: ${(props) => props.theme.startMenu.startMenuButton};
 	}
 `;
 
@@ -223,13 +223,13 @@ const ButtonImage = styled.button`
 	width: 17px;
 	height: 17px;
 	border: none;
-	background: #fff;
+	background: ${(props) => props.theme.startMenu.buttonImage};
 	mask-image: url('/window_logo.png');
 	-webkit-mask-box-image: url('/window_logo.png');
 	background-position: center center;
 
 	:hover {
-		background: skyblue;
+		background: ${(props) => props.theme.startMenu.startMenuHover};
 	}
 `;
 
@@ -243,7 +243,7 @@ const SearchInputContainer = styled.div`
 	svg {
 		width: 15px;
 		height: 15px;
-		color: #fff;
+		color: ${(props) => props.theme.startMenu.buttonImage};
 		position: absolute;
 		left: 13px;
 	}
@@ -255,12 +255,12 @@ const SearchInput = styled.input`
 	border: 1px solid rgba(0, 0, 0, 0.7);
 	font-size: 1.5rem;
 	font-weight: lighter;
-	color: #fff;
-	background-color: #666;
+	color: ${(props) => props.theme.startMenu.searchInputText};
+	background-color: ${(props) => props.theme.startMenu.searchInput};
 	padding-left: 35px;
 
 	::placeholder {
-		color: #fff;
+		color: ${(props) => props.theme.startMenu.searchInputText};
 		font-size: 1.5rem;
 	}
 
@@ -282,10 +282,14 @@ const ProgmamIcon = styled.div<{ topProgram: boolean }>`
 	justify-content: center;
 	align-items: center;
 	border-bottom: 2px solid skyblue;
-	background-color: ${(props) => (props.topProgram ? '#444' : 'inherit')};
+	background-color: ${(props) =>
+		props.topProgram ? props.theme.startMenu.runningTop : props.theme.startMenu.runningProgram};
 
 	:hover {
-		background-color: ${(props) => (props.topProgram ? '#555' : '#333')};
+		background-color: ${(props) =>
+			props.topProgram
+				? props.theme.startMenu.runningTopHover
+				: props.theme.startMenu.runningHover};
 		cursor: pointer;
 	}
 `;
@@ -297,18 +301,18 @@ const MenuToggle = styled.div`
 	z-index: 101;
 	left: 0;
 	bottom: 40px;
-	background-color: #444;
+	background-color: ${(props) => props.theme.startMenu.runningProgram};
 	display: flex;
 `;
 
 const SideMenu = styled.div`
 	width: 48px;
 	height: 100%;
-	background-color: #333;
+	background-color: ${(props) => props.theme.startMenu.runningHover};
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
-	color: #fff;
+	color: ${(props) => props.theme.startMenu.searchInputText}; ;
 `;
 
 const SideMenuButton = styled.div`
@@ -321,7 +325,7 @@ const SideMenuButton = styled.div`
 	position: relative;
 
 	:hover {
-		background-color: #2d2d2d;
+		background-color: ${(props) => props.theme.startMenu.sideMenuHover};
 		cursor: pointer;
 	}
 `;
@@ -329,7 +333,7 @@ const SideMenuButton = styled.div`
 const CreateNewFolder = styled.div`
 	width: 250px;
 	height: 48px;
-	background-color: #333;
+	background-color: ${(props) => props.theme.startMenu.runningHover};
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -343,11 +347,11 @@ const NewFolderInput = styled.input`
 	height: 30px;
 	padding: 0 5px;
 	font-size: 1.5rem;
-	background-color: #aaa;
+	background-color: ${(props) => props.theme.startMenu.searchInput};
 	border: none;
 
 	::placeholder {
-		color: #222;
+		color: ${(props) => props.theme.startMenu.searchInputText};
 	}
 
 	:focus {
@@ -361,7 +365,7 @@ const ConfirmButton = styled.button`
 	border: none;
 	font-size: 1.4rem;
 	font-weight: 700;
-	background-color: #ddd;
+	background-color: ${(props) => props.theme.startMenu.confirmButton};
 
 	:focus {
 		background-color: #bbb;

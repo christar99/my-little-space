@@ -1,12 +1,14 @@
-import React, { useState, MouseEvent } from 'react';
+import React, { useEffect, useMemo, MouseEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import {
 	addIconList,
+	backgroundAtom,
 	deleteProgramAtom,
 	modifyProgramAtom,
 	selectedIcon,
+	setDarkModeAtom,
 	startMenuToggle
 } from 'store';
 import { changeZIndex, executeProgram, exitProgram } from 'store/programs';
@@ -29,6 +31,8 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 	const [iconList, deleteProgram] = useAtom(deleteProgramAtom);
 	const [notus4, addNewIcon] = useAtom(addIconList);
 	const [notUse3, modifyProgram] = useAtom(modifyProgramAtom);
+	const [background] = useAtom(backgroundAtom);
+	const [darkMode] = useAtom(setDarkModeAtom);
 
 	const handleClickIcon = (e: MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
@@ -158,6 +162,16 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		]);
 	};
 
+	const backgroundLight = useMemo(() => {
+		if (from === 'wallpaper') {
+			return (
+				!['#f1da0f', '#c9cfd3'].includes(background.value) && background.type !== 'image'
+			);
+		} else {
+			return darkMode;
+		}
+	}, [from, darkMode, background]);
+
 	return (
 		<>
 			<Icon
@@ -173,8 +187,9 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 					alt={icon.name}
 					data-name={icon.name}
 					data-type={icon.type}
+					priority={true}
 				/>
-				<IconName from={from}>{icon.name}</IconName>
+				<IconName backgroundLight={backgroundLight}>{icon.name}</IconName>
 			</Icon>
 		</>
 	);
@@ -194,14 +209,14 @@ const Icon = styled.div<{ selected: boolean }>`
 	z-index: 101;
 `;
 
-const IconName = styled.span<{ from: string }>`
+const IconName = styled.span<{ backgroundLight: boolean }>`
 	width: 80px;
 	min-height: 18px;
 	display: flex;
 	justify-content: center;
 	text-align: center;
 	font-size: 1.5rem;
-	color: ${(props) => (props.from === 'wallpaper' ? '#fff' : '#000')};
+	color: ${(props) => (props.backgroundLight ? '#fff' : '#000')};
 	overflow: hidden;
 	text-overflow: ellipsis;
 	word-break: break-all;

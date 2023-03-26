@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { useAtom } from 'jotai';
-import { needAccount, startMenuToggle } from 'store';
+import { needAccount, setDarkModeAtom, startMenuToggle } from 'store';
+import { darkTheme, lightTheme } from 'utils/theme';
 import Login from 'components/units/Login';
 import StartMenu from 'components/units/StartMenu';
 import WallpaperIcons from 'components/units/WallpaperIcons';
@@ -10,6 +11,7 @@ import Programs from 'components/units/Programs';
 export default function Viewport() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
 	const [account, setLogin] = useAtom(needAccount);
+	const [darkMode, setDarkMode] = useAtom(setDarkModeAtom);
 
 	const handleToggle = () => {
 		setToggleOn(false);
@@ -17,13 +19,17 @@ export default function Viewport() {
 
 	useEffect(() => {
 		const loginAccount = localStorage.getItem('account');
+		const isDarkMode = localStorage.getItem('darkMode') === 'true';
 		if (loginAccount !== null) {
 			setLogin(loginAccount);
+		}
+		if (isDarkMode) {
+			setDarkMode(isDarkMode);
 		}
 	}, []);
 
 	return (
-		<>
+		<ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
 			{account === null ? (
 				<Login />
 			) : (
@@ -35,7 +41,7 @@ export default function Viewport() {
 					<StartMenu />
 				</Screen>
 			)}
-		</>
+		</ThemeProvider>
 	);
 }
 

@@ -56,3 +56,11 @@ export const screenShotAtom = atom(
 		set(screenShot, src);
 	}
 );
+
+const darkMode = atom<boolean>(false);
+export const setDarkModeAtom = atom(
+	(get) => get(darkMode),
+	(get, set, mode: boolean) => {
+		set(darkMode, mode);
+	}
+);

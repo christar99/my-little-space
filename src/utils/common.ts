@@ -28,7 +28,7 @@ export const initialIcon = [
 			},
 			{
 				name: '테마 설정',
-				uuid: 'fee019d3-1196-4cb2-b82c-47d57f2b1952',
+				uuid: '954a9aaf-9454-4736-8d3b-cbe7bebd2099',
 				image: '/icons/colorTheme.png',
 				type: 'setting',
 				from: '내 컴퓨터'

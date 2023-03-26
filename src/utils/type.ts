@@ -1,3 +1,30 @@
+declare module 'styled-components' {
+	export interface DefaultTheme {
+		program: {
+			topBarColor: string;
+			topBarButtonHover: string;
+			borderColor: string;
+			backgroundColor: string;
+			textColor: string;
+			textHover: string;
+		};
+		startMenu: {
+			menuContainer: string;
+			startMenuButton: string;
+			buttonImage: string;
+			startMenuHover: string;
+			searchInput: string;
+			searchInputText: string;
+			runningProgram: string;
+			runningTop: string;
+			runningHover: string;
+			runningTopHover: string;
+			confirmButton: string;
+			sideMenuHover: string;
+		};
+	}
+}
+
 export interface iconType {
 	name: string;
 	uuid: string;

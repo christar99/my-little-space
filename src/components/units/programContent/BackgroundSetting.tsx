@@ -4,17 +4,12 @@ import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import { backgroundAtom, screenShotAtom } from 'store';
 import { exitProgram } from 'store/programs';
-import { programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
 import { colors, uuid } from 'utils/common';
 import { S3PutObject, S3DeleteObject } from 'utils/aws';
 import { BsCheck } from 'react-icons/bs';
 
-interface BackgroundSettingProps {
-	program: programType;
-}
-
-export default function BackgroundSetting({ program }: BackgroundSettingProps) {
+export default function BackgroundSetting() {
 	const [programList, closeProgram] = useAtom(exitProgram);
 	const [type, setType] = useState<string>('color');
 	const [background, setBackground] = useAtom(backgroundAtom);
@@ -127,11 +122,11 @@ const BackgroundContainer = styled.div`
 	gap: 30px;
 	padding: 20px 30px;
 	position: relative;
+    color: ${(props) => props.theme.program.textColor};
 `;
 
 const Title = styled.span`
 	font-size: 3rem;
-	color: #fff;
 `;
 
 const Switch = styled.div`
@@ -141,7 +136,6 @@ const Switch = styled.div`
 	border: 1px solid #fff;
 	border-radius: 5px;
 	background-color: #444;
-	color: #fff;
 `;
 
 const Button = styled.div<{ currentType: boolean }>`

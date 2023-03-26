@@ -41,6 +41,7 @@ const DocumentContainer = styled.div`
 	gap: 20px;
 	padding: 20px 30px;
 	position: relative;
+	color: ${(props) => props.theme.program.textColor};
 `;
 
 const NoContent = styled.p`
@@ -50,7 +51,6 @@ const NoContent = styled.p`
 	justify-content: center;
 	position: absolute;
 	font-size: 1.3rem;
-	color: #fff;
 	user-select: none;
 `;
 

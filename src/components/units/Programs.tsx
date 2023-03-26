@@ -194,8 +194,7 @@ const Program = styled.div<{ programStyle: programStyle }>`
 	top: ${(props) => props.programStyle.top + 'px'};
 	left: ${(props) => props.programStyle.left + 'px'};
 	z-index: ${(props) => props.programStyle.zIndex};
-	border: 1px solid rgba(0, 0, 0, 0.5);
-	background-color: #fff;
+	border: 1px solid ${(props) => props.theme.program.borderColor};
 `;
 
 const TopBar = styled.div`
@@ -204,8 +203,9 @@ const TopBar = styled.div`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	color: #fff;
-	background-color: #222;
+	color: ${(props) => props.theme.program.textColor};
+	border-bottom: 1px solid ${(props) => props.theme.program.borderColor};
+	background-color: ${(props) => props.theme.program.topBarColor};
 	user-select: none;
 `;
 
@@ -224,7 +224,7 @@ const ControlGroup = styled.div`
 
 const ControlButton = styled.div`
 	width: 35px;
-	height: 35px;
+	height: 34px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -232,7 +232,7 @@ const ControlButton = styled.div`
 
 	:hover {
 		cursor: pointer;
-		background-color: #000;
+		background-color: ${(props) => props.theme.program.topBarButtonHover};
 	}
 `;
 
