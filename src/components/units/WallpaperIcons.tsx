@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import styled from 'styled-components';
-import { addIconList, backgroundAtom, screenShotAtom, selectedIcon, startMenuToggle } from 'store';
+import { backgroundAtom, screenShotAtom, selectedIcon, startMenuToggle } from 'store';
+import { addIconList } from 'store/icons';
 import { executeProgram, changeZIndex } from 'store/programs';
 import { backgroundType, iconType, ListObjectProps } from 'utils/type';
 import { S3ListObject, S3GetObject } from 'utils/aws';

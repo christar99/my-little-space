@@ -2,15 +2,8 @@ import React, { useEffect, useMemo, MouseEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import {
-	addIconList,
-	backgroundAtom,
-	deleteProgramAtom,
-	modifyProgramAtom,
-	selectedIcon,
-	setDarkModeAtom,
-	startMenuToggle
-} from 'store';
+import { backgroundAtom, selectedIcon, setDarkModeAtom, startMenuToggle } from 'store';
+import { addIconList, deleteProgramAtom, modifyProgramAtom } from 'store/icons';
 import { changeZIndex, executeProgram, exitProgram } from 'store/programs';
 import { allCookie, removeCookie, setCookie } from 'utils/Cookie';
 import { iconType } from 'utils/type';

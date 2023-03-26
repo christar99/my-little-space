@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import IconComponent from 'components/common/IconComponent';
 import { programType } from 'utils/type';
 import { useAtom } from 'jotai';
-import { selectedIcon, deleteProgramAtom } from 'store';
+import { selectedIcon } from 'store';
+import { deleteProgramAtom } from 'store/icons';
 
 interface DocumentContentProps {
 	program: programType;

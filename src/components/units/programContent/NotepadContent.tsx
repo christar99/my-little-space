@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { addIconList } from 'store';
+import { addIconList } from 'store/icons';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';

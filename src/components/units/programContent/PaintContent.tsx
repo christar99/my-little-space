@@ -2,7 +2,7 @@ import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState, useCallbac
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { addIconList } from 'store';
+import { addIconList } from 'store/icons';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { S3PutObject } from 'utils/aws';
