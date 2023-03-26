@@ -1,7 +1,13 @@
 import React, { useEffect } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { useAtom } from 'jotai';
-import { needAccount, setDarkModeAtom, startMenuToggle } from 'store';
+import {
+	needAccount,
+	setDarkModeAtom,
+	setFontStyleAtom,
+	setResolutionAtom,
+	startMenuToggle
+} from 'store';
 import { darkTheme, lightTheme } from 'utils/theme';
 import Login from 'components/units/Login';
 import StartMenu from 'components/units/StartMenu';
@@ -12,6 +18,8 @@ export default function Viewport() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
 	const [account, setLogin] = useAtom(needAccount);
 	const [darkMode, setDarkMode] = useAtom(setDarkModeAtom);
+	const [notUse, setResolution] = useAtom(setResolutionAtom);
+	const [fontFamily, setFontStyle] = useAtom(setFontStyleAtom);
 
 	const handleToggle = () => {
 		setToggleOn(false);
@@ -20,11 +28,19 @@ export default function Viewport() {
 	useEffect(() => {
 		const loginAccount = localStorage.getItem('account');
 		const isDarkMode = localStorage.getItem('darkMode') === 'true';
+		const resolution = localStorage.getItem('resolution');
+		const fontStyle = localStorage.getItem('fontStyle');
 		if (loginAccount !== null) {
 			setLogin(loginAccount);
 		}
 		if (isDarkMode) {
 			setDarkMode(isDarkMode);
+		}
+		if (resolution !== null) {
+			setResolution(Number(resolution));
+		}
+		if (fontStyle !== null) {
+			setFontStyle(JSON.parse(fontStyle));
 		}
 	}, []);
 
@@ -33,7 +49,7 @@ export default function Viewport() {
 			{account === null ? (
 				<Login />
 			) : (
-				<Screen>
+				<Screen fontFamily={fontFamily.value[0] + ', ' + fontFamily.value[1]}>
 					<Desktop onClick={handleToggle} onMouseUp={(e) => e.preventDefault()}>
 						<WallpaperIcons />
 						<Programs />
@@ -45,11 +61,12 @@ export default function Viewport() {
 	);
 }
 
-const Screen = styled.div`
+const Screen = styled.div<{ fontFamily: string }>`
 	width: 100vw;
 	height: 100vh;
 	position: relative;
 	overflow: hidden;
+	font-family: ${(props) => props.fontFamily};
 `;
 
 const Desktop = styled.div`

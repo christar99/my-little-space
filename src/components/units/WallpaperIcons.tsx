@@ -1,7 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import styled from 'styled-components';
-import { backgroundAtom, screenShotAtom, selectedIcon, startMenuToggle } from 'store';
+import {
+	backgroundAtom,
+	screenShotAtom,
+	selectedIcon,
+	setResolutionAtom,
+	startMenuToggle
+} from 'store';
 import { addIconList } from 'store/icons';
 import { executeProgram, changeZIndex } from 'store/programs';
 import { backgroundType, iconType, ListObjectProps } from 'utils/type';
@@ -23,6 +29,7 @@ export default function WallpaperIcons() {
 	const desktopRef = useRef<HTMLDivElement>(null);
 	const [background, setBackground] = useAtom(backgroundAtom);
 	const [notuse3, setScreenShot] = useAtom(screenShotAtom);
+	const [resolution] = useAtom(setResolutionAtom);
 
 	useEffect(() => {
 		const savedBackground = localStorage.getItem('background');
@@ -217,7 +224,8 @@ export default function WallpaperIcons() {
 			ref={desktopRef}
 			background={background}
 			onClick={handleClickIcon}
-			data-type={'desktop'}>
+			data-type={'desktop'}
+			resolution={resolution}>
 			{icons.map((icon, index) => {
 				return <IconComponent key={index} icon={icon} from="wallpaper" />;
 			})}
@@ -225,10 +233,10 @@ export default function WallpaperIcons() {
 	);
 }
 
-const Desktop = styled.div<{ background: backgroundType }>`
+const Desktop = styled.div<{ background: backgroundType; resolution: number }>`
 	width: 100%;
 	height: calc(100% - 40px);
-	padding: 50px;
+	padding: ${(props) => props.resolution * 10 + 30 + 'px'};
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;

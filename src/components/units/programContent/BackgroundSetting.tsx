@@ -116,13 +116,13 @@ export default function BackgroundSetting() {
 const BackgroundContainer = styled.div`
 	width: 100%;
 	height: 100%;
+	overflow-y: auto;
 	display: flex;
-	flex-wrap: wrap;
 	flex-direction: column;
 	gap: 30px;
 	padding: 20px 30px;
 	position: relative;
-    color: ${(props) => props.theme.program.textColor};
+	color: ${(props) => props.theme.program.textColor};
 `;
 
 const Title = styled.span`

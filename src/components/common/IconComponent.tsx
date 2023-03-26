@@ -2,7 +2,13 @@ import React, { useEffect, useMemo, MouseEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { backgroundAtom, selectedIcon, setDarkModeAtom, startMenuToggle } from 'store';
+import {
+	backgroundAtom,
+	selectedIcon,
+	setDarkModeAtom,
+	setResolutionAtom,
+	startMenuToggle
+} from 'store';
 import { addIconList, deleteProgramAtom, modifyProgramAtom } from 'store/icons';
 import { changeZIndex, executeProgram, exitProgram } from 'store/programs';
 import { allCookie, removeCookie, setCookie } from 'utils/Cookie';
@@ -26,6 +32,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 	const [notUse3, modifyProgram] = useAtom(modifyProgramAtom);
 	const [background] = useAtom(backgroundAtom);
 	const [darkMode] = useAtom(setDarkModeAtom);
+	const [resolution] = useAtom(setResolutionAtom);
 
 	const handleClickIcon = (e: MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
@@ -172,43 +179,46 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 				onClick={(e) => handleClickIcon(e)}
 				onDoubleClick={handleOpenProgram}
 				draggable={true}
-				onDragEnd={(e) => dragProgram(e)}>
+				onDragEnd={(e) => dragProgram(e)}
+				resolution={resolution}>
 				<Image
 					src={icon.image}
-					width={60}
-					height={60}
+					width={resolution * 30}
+					height={resolution * 30}
 					alt={icon.name}
 					data-name={icon.name}
 					data-type={icon.type}
 					priority={true}
 				/>
-				<IconName backgroundLight={backgroundLight}>{icon.name}</IconName>
+				<IconName backgroundLight={backgroundLight} resolution={resolution}>
+					{icon.name}
+				</IconName>
 			</Icon>
 		</>
 	);
 }
 
-const Icon = styled.div<{ selected: boolean }>`
-	width: 80px;
-	height: 100px;
+const Icon = styled.div<{ selected: boolean; resolution: number }>`
+	width: ${(props) => props.resolution * 40 + 'px'};
+	height: ${(props) => props.resolution * 50 + 'px'};
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	gap: 5px;
+	gap: ${(props) => props.resolution * 2 + 'px'};
 	background: ${(props) => (props.selected ? '#8ba3d6' : 'none')};
 	border: ${(props) => (props.selected ? '1px dashed purple' : 'none')};
 	user-select: none;
 	z-index: 101;
 `;
 
-const IconName = styled.span<{ backgroundLight: boolean }>`
-	width: 80px;
-	min-height: 18px;
+const IconName = styled.span<{ backgroundLight: boolean; resolution: number }>`
+	width: ${(props) => props.resolution * 40 + 'px'};
+	min-height: ${(props) => props.resolution * 7 + 'px'};
 	display: flex;
 	justify-content: center;
 	text-align: center;
-	font-size: 1.5rem;
+	font-size: ${(props) => props.resolution * 0.75 + 'rem'};
 	color: ${(props) => (props.backgroundLight ? '#fff' : '#000')};
 	overflow: hidden;
 	text-overflow: ellipsis;

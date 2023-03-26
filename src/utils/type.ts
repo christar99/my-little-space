@@ -86,3 +86,8 @@ export interface backgroundType {
 	type: string;
 	value: string;
 }
+
+export interface fontStyleProps {
+	name: string;
+	value: string[];
+}

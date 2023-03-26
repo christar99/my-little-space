@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent, useCallback } from 'react';
+import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import { addIconList } from 'store/icons';
 import { changeZIndex, exitProgram } from 'store/programs';
-import { programType } from 'utils/type';
+import { fontStyleProps, programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
 import { S3PutObject } from 'utils/aws';
-import { uuid } from 'utils/common';
+import { fontStyle, uuid } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
+import { setResolutionAtom } from 'store';
 
 interface NotepadContentProps {
 	program: programType;
@@ -18,26 +19,11 @@ interface signitureIndexProps {
 	[key: string]: string;
 }
 
-interface fontStyleProps {
-	name: string;
-	value: string[];
-}
-
 const settingValue: signitureIndexProps = {
 	save: '저장하기',
 	fontStyle: '글꼴',
 	fontSize: '글자 크기'
 };
-
-const fontStyle: fontStyleProps[] = [
-	{ name: '바탕', value: ['Noto Serif KR', 'serif'] },
-	{ name: '고딕', value: ['Nanum Gothic', 'sans-serif'] },
-	{ name: '명조', value: ['Nanum Myeongjo', 'serif'] },
-	{ name: '펜스크립트', value: ['Nanum Pen Script', 'cursive'] },
-	{ name: '싱글데이', value: ['Single Day', 'cursive'] },
-	{ name: '블랙한산스', value: ['Black Han Sans', 'sans-serif'] },
-	{ name: '주아', value: ['Jua', 'sans-serif'] }
-];
 
 function NotepadContent({ program }: NotepadContentProps) {
 	const { notepadContent } = program;
@@ -60,6 +46,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 	const filenameRef = useRef<HTMLInputElement>(null);
 	const [notUse, closeProgram] = useAtom(exitProgram);
 	const [iconList, addNewIcon] = useAtom(addIconList);
+	const [resolution] = useAtom(setResolutionAtom);
 
 	useEffect(() => {
 		setDropDownMenu(null);
@@ -148,36 +135,44 @@ function NotepadContent({ program }: NotepadContentProps) {
 
 	return (
 		<NotepadContainer>
-			<SettingLine>
+			<SettingLine resolution={resolution}>
 				<SettingMenu
+					resolution={resolution}
 					background={dropDownMenu === 'file'}
 					onClick={(e) => handleDropDown(e, 'file')}>
 					파일
 					{dropDownMenu === 'file' && (
-						<Dropdown zIndex={zIndex + 2}>
-							<DetailMenu onClick={() => handleModalOpen('save')}>
+						<Dropdown zIndex={zIndex + 2} resolution={resolution}>
+							<DetailMenu
+								resolution={resolution}
+								onClick={() => handleModalOpen('save')}>
 								다른이름으로 저장
 							</DetailMenu>
 						</Dropdown>
 					)}
 				</SettingMenu>
 				<SettingMenu
+					resolution={resolution}
 					background={dropDownMenu === 'form'}
 					onClick={(e) => handleDropDown(e, 'form')}>
 					서식
 					{dropDownMenu === 'form' && (
-						<Dropdown zIndex={zIndex + 2}>
-							<DetailMenu onClick={() => handleModalOpen('fontStyle')}>
+						<Dropdown resolution={resolution} zIndex={zIndex + 2}>
+							<DetailMenu
+								resolution={resolution}
+								onClick={() => handleModalOpen('fontStyle')}>
 								글꼴
 							</DetailMenu>
-							<DetailMenu onClick={() => handleModalOpen('fontSize')}>
+							<DetailMenu
+								resolution={resolution}
+								onClick={() => handleModalOpen('fontSize')}>
 								글자크기
 							</DetailMenu>
 						</Dropdown>
 					)}
 				</SettingMenu>
 			</SettingLine>
-			<TextContainer>
+			<TextContainer resolution={resolution}>
 				<TextArea
 					ref={textAreaRef}
 					fontSize={fontSize}
@@ -238,21 +233,21 @@ const NotepadContainer = styled.div`
 	height: 100%;
 `;
 
-const SettingLine = styled.div`
+const SettingLine = styled.div<{ resolution: number }>`
 	width: 100%;
-	height: 25px;
+	height: ${(props) => props.resolution * 13 + 'px'};
 	background-color: #fff;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 	display: flex;
 `;
 
-const SettingMenu = styled.div<{ background: boolean }>`
-	width: 50px;
+const SettingMenu = styled.div<{ background: boolean; resolution: number }>`
+	width: ${(props) => props.resolution * 25 + 'px'};
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	font-size: 1.2rem;
+	font-size: ${(props) => props.resolution * 0.75 + 'rem'};
 	position: relative;
 	background-color: ${(props) => (props.background ? '#b2d8e7' : 'inherit')};
 	user-select: none;
@@ -264,19 +259,19 @@ const SettingMenu = styled.div<{ background: boolean }>`
 	}
 `;
 
-const Dropdown = styled.div<{ zIndex: number }>`
-	width: 120px;
+const Dropdown = styled.div<{ zIndex: number; resolution: number }>`
+	width: ${(props) => props.resolution * 70 + 'px'};
 	position: absolute;
 	left: 0;
-	top: 25px;
+	top: ${(props) => props.resolution * 13 + 'px'};
 	border: 1px solid #ccc;
 	background-color: #f7eff2;
 	box-shadow: 5px 5px 5px #555;
 	z-index: ${(props) => props.zIndex};
 `;
-const DetailMenu = styled.div`
+const DetailMenu = styled.div<{ resolution: number }>`
 	width: 100%;
-	height: 20px;
+	height: ${(props) => props.resolution * 10 + 'px'};
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -287,9 +282,9 @@ const DetailMenu = styled.div`
 	}
 `;
 
-const TextContainer = styled.div`
+const TextContainer = styled.div<{ resolution: number }>`
 	width: 100%;
-	height: calc(100% - 25px);
+	height: ${(props) => `calc(100% - ${props.resolution * 13}px)`};
 	display: flex;
 	justify-content: center;
 	align-items: center;

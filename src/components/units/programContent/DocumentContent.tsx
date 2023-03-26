@@ -39,6 +39,7 @@ const DocumentContainer = styled.div`
 	height: 100%;
 	display: flex;
 	flex-wrap: wrap;
+	overflow-y: auto;
 	gap: 20px;
 	padding: 20px 30px;
 	position: relative;

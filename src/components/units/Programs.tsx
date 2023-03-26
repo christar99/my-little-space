@@ -9,6 +9,7 @@ import ProgramContent from 'components/common/ProgramContent';
 import { VscChromeMinimize } from 'react-icons/vsc';
 import { VscChromeMaximize } from 'react-icons/vsc';
 import { AiOutlineClose } from 'react-icons/ai';
+import { setResolutionAtom } from 'store';
 
 interface adJustStatusType {
 	display: string;
@@ -33,6 +34,7 @@ function Programs() {
 		left: 0,
 		zIndex: 0
 	});
+	const [resolution] = useAtom(setResolutionAtom);
 
 	const setZIndexTop = (program: programType) => {
 		setBigZIndex();
@@ -145,6 +147,7 @@ function Programs() {
 						programStyle={program.style}
 						onClick={() => setZIndexTop(program)}>
 						<TopBar
+							resolution={resolution}
 							onDoubleClick={(e) => windowMaximize(e, program)}
 							draggable={true}
 							onDragStart={(e) => handleDragStart(e, program)}
@@ -153,20 +156,24 @@ function Programs() {
 							<ProgramInfo>
 								<Image
 									src={program.image}
-									width={20}
-									height={20}
+									width={resolution * 10}
+									height={resolution * 10}
 									alt="programIcon"
 								/>
-								<ProgramName> {program.name}</ProgramName>
+								<ProgramName resolution={resolution}> {program.name}</ProgramName>
 							</ProgramInfo>
 							<ControlGroup>
-								<ControlButton onClick={(e) => windowMinimize(e, program)}>
+								<ControlButton
+									resolution={resolution}
+									onClick={(e) => windowMinimize(e, program)}>
 									<VscChromeMinimize />
 								</ControlButton>
-								<ControlButton onClick={(e) => windowMaximize(e, program)}>
+								<ControlButton
+									resolution={resolution}
+									onClick={(e) => windowMaximize(e, program)}>
 									<VscChromeMaximize />
 								</ControlButton>
-								<ControlButton>
+								<ControlButton resolution={resolution}>
 									<AiOutlineClose onClick={() => handleCloseProgram(program)} />
 								</ControlButton>
 							</ControlGroup>
@@ -197,9 +204,9 @@ const Program = styled.div<{ programStyle: programStyle }>`
 	border: 1px solid ${(props) => props.theme.program.borderColor};
 `;
 
-const TopBar = styled.div`
-	height: 35px;
-	padding-left: 10px;
+const TopBar = styled.div<{ resolution: number }>`
+	height: ${(props) => props.resolution * 17 + 5 + 'px'};
+	padding-left: ${(props) => props.resolution * 5 + 'px'};
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -214,21 +221,23 @@ const ProgramInfo = styled.div`
 	gap: 10px;
 `;
 
-const ProgramName = styled.span`
-	font-size: 1.4rem;
+const ProgramName = styled.span<{ resolution: number }>`
+	font-size: ${(props) => props.resolution * 0.75 + 'rem'};
+	display: flex;
+	align-items: center;
 `;
 
 const ControlGroup = styled.div`
 	display: flex;
 `;
 
-const ControlButton = styled.div`
-	width: 35px;
-	height: 34px;
+const ControlButton = styled.div<{ resolution: number }>`
+	width: ${(props) => props.resolution * 17 + 'px'};
+	height: ${(props) => props.resolution * 17 + 'px'};
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-size: 1.7rem;
+	font-size: ${(props) => props.resolution * 0.85 + 'rem'};
 
 	:hover {
 		cursor: pointer;

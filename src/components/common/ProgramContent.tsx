@@ -7,14 +7,17 @@ import ImageContent from 'components/units/programContent/ImageContent';
 import DocumentContent from 'components/units/programContent/DocumentContent';
 import BackgroundSetting from 'components/units/programContent/BackgroundSetting';
 import ThemeSetting from 'components/units/programContent/ThemeSetting';
+import { setResolutionAtom } from 'store';
+import { useAtom } from 'jotai';
 
 interface ProgramContentProps {
 	program: programType;
 }
 
 function ProgramContent({ program }: ProgramContentProps) {
+	const [resolution] = useAtom(setResolutionAtom);
 	return (
-		<ProgramBackground>
+		<ProgramBackground resolution={resolution}>
 			{program.type === 'notepad' && <NotepadContent program={program} />}
 			{program.type === 'paint' && <PaintContent program={program} />}
 			{program.type === 'image' && <ImageContent program={program} />}
@@ -25,9 +28,9 @@ function ProgramContent({ program }: ProgramContentProps) {
 	);
 }
 
-const ProgramBackground = styled.div`
+const ProgramBackground = styled.div<{ resolution: number }>`
 	width: 100%;
-	height: calc(100% - 36px);
+	height: ${(props) => `calc(100% - ${props.resolution * 17 + 5}px)`};
 	background-color: ${(props) => props.theme.program.backgroundColor};
 `;
 

@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { backgroundType } from 'utils/type';
+import { backgroundType, fontStyleProps } from 'utils/type';
 
 export const needAccount = atom<string | null>(null);
 export const startMenuToggle = atom<boolean>(false);
@@ -36,5 +36,21 @@ export const setDarkModeAtom = atom(
 	(get) => get(darkMode),
 	(get, set, mode: boolean) => {
 		set(darkMode, mode);
+	}
+);
+
+const resolution = atom<number>(2);
+export const setResolutionAtom = atom(
+	(get) => get(resolution),
+	(get, set, value: number) => {
+		set(resolution, value);
+	}
+);
+
+const fontStyle = atom<fontStyleProps>({ name: '고딕', value: ['Nanum Gothic', 'sans-serif'] });
+export const setFontStyleAtom = atom(
+	(get) => get(fontStyle),
+	(get, set, font: fontStyleProps) => {
+		set(fontStyle, font);
 	}
 );

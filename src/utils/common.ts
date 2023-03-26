@@ -1,3 +1,5 @@
+import { fontStyleProps } from './type';
+
 const account =
 	typeof window === 'undefined' ? undefined : (window.localStorage.getItem('account') as string);
 export const uuid = account === null || account === undefined ? '' : JSON.parse(account).uuid;
@@ -71,4 +73,14 @@ export const colors = [
 	{ code: '#5c2a09' },
 	{ code: '#c9cfd3' },
 	{ code: '#ff0000' }
+];
+
+export const fontStyle: fontStyleProps[] = [
+	{ name: '바탕', value: ['Noto Serif KR', 'serif'] },
+	{ name: '고딕', value: ['Nanum Gothic', 'sans-serif'] },
+	{ name: '명조', value: ['Nanum Myeongjo', 'serif'] },
+	{ name: '펜스크립트', value: ['Nanum Pen Script', 'cursive'] },
+	{ name: '싱글데이', value: ['Single Day', 'cursive'] },
+	{ name: '블랙한산스', value: ['Black Han Sans', 'sans-serif'] },
+	{ name: '주아', value: ['Jua', 'sans-serif'] }
 ];
