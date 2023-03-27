@@ -10,7 +10,7 @@ import 'dayjs/locale/ko';
 dayjs.locale('ko');
 
 function Loading() {
-	const [currentTime] = useState<dayjs.Dayjs>(dayjs());
+	const [currentTime, setCurrentTime] = useState<dayjs.Dayjs>();
 	const [isLogin, setLogin] = useAtom(needAccount);
 	const [userName, setUserName] = useState<string>('');
 	const [onLoginScreen, setLoginScreen] = useState<boolean>(false);
@@ -19,11 +19,15 @@ function Loading() {
 		setLoginScreen(true);
 	};
 
-	const timeSet = useMemo(() => {
-		const time = currentTime.format('HH:mm');
-		const date = currentTime.format('M월 DD일 dddd');
-		return { time, date };
+	useEffect(() => {
+		setCurrentTime(dayjs());
 	}, []);
+
+	const timeSet = useMemo(() => {
+		const time = currentTime?.format('HH:mm');
+		const date = currentTime?.format('M월 DD일 dddd');
+		return { time, date };
+	}, [currentTime]);
 
 	const handleSubmitID = () => {
 		const account = {
