@@ -231,6 +231,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 const NotepadContainer = styled.div`
 	width: 100%;
 	height: 100%;
+	border: 1px solid rgba(0, 0, 0, 0.5);
 `;
 
 const SettingLine = styled.div<{ resolution: number }>`

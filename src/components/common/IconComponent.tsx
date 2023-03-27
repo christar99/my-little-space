@@ -64,7 +64,11 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 	};
 
 	const handleDeleteProgram = () => {
-		if (['내 컴퓨터', '휴지통', '메모장', '그림판'].includes(icon.name)) {
+		if (
+			['내 컴퓨터', '휴지통', '메모장', '그림판', '배경화면 설정', '테마 설정'].includes(
+				icon.name
+			)
+		) {
 			alert('기본프로그램은 삭제못해요!');
 			return;
 		}
@@ -109,7 +113,11 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		if (folderName === '내 컴퓨터') {
 			return;
 		}
-		if (['내 컴퓨터', '휴지통', '메모장', '그림판'].includes(icon.name)) {
+		if (
+			['내 컴퓨터', '휴지통', '메모장', '그림판', '배경화면 설정', '테마 설정'].includes(
+				icon.name
+			)
+		) {
 			alert('기본 프로그램은 폴더에 못넣어요!');
 			return;
 		}

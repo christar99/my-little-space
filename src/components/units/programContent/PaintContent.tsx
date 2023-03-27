@@ -270,6 +270,7 @@ const PaintContainer = styled.div`
 	user-select: none;
 	background-color: #aecbd6;
 	position: relative;
+	border: 1px solid rgba(0, 0, 0, 0.5);
 `;
 
 const TopMenu = styled.div`
