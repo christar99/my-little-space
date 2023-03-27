@@ -214,7 +214,7 @@ const Icon = styled.div<{ selected: boolean; resolution: number }>`
 
 const IconName = styled.span<{ backgroundLight: boolean; resolution: number }>`
 	width: ${(props) => props.resolution * 40 + 'px'};
-	min-height: ${(props) => props.resolution * 7 + 'px'};
+	min-height: ${(props) => props.resolution * 7 + 5 + 'px'};
 	display: flex;
 	justify-content: center;
 	text-align: center;
