@@ -82,7 +82,7 @@ export default function WallpaperIcons() {
 		if (textFile.length > 0) {
 			textFileList = await createTextFile(cookies, textFile, folderList.allDocumentFile);
 		}
-		if (imageFileList.length > 0) {
+		if (imageFile.length > 0) {
 			imageFileList = createImageFile(cookies, imageFile, folderList.allDocumentFile);
 		}
 
