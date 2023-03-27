@@ -15,6 +15,7 @@ module.exports = {
 		styledComponents: true
 	},
 	images: {
-		domains: ['mylittlespace-s3.s3.ap-northeast-2.amazonaws.com']
+		domains: ['mylittlespace-s3.s3.ap-northeast-2.amazonaws.com'],
+		formats: ['image/avif', 'image/webp']
 	}
 };

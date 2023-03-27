@@ -1,4 +1,4 @@
-import React, { useState, DragEvent } from 'react';
+import React, { useState, useMemo, useEffect, DragEvent } from 'react';
 import Image from 'next/image';
 import { useAtom } from 'jotai';
 import { needAccount } from 'store';
@@ -19,6 +19,12 @@ function Loading() {
 		setLoginScreen(true);
 	};
 
+	const timeSet = useMemo(() => {
+		const time = currentTime.format('HH:mm');
+		const date = currentTime.format('M월 DD일 dddd');
+		return { time, date };
+	}, []);
+
 	const handleSubmitID = () => {
 		const account = {
 			name: userName,
@@ -38,8 +44,8 @@ function Loading() {
 		<LoadingScreen draggable={true} onDragEnd={(e) => handleDragScreen(e)}>
 			{!onLoginScreen ? (
 				<Date>
-					<CurrentTime>{currentTime.format('HH:mm')}</CurrentTime>
-					<CurrentDate>{currentTime.format('M월 DD일 dddd')}</CurrentDate>
+					<CurrentTime>{timeSet.time}</CurrentTime>
+					<CurrentDate>{timeSet.date}</CurrentDate>
 				</Date>
 			) : (
 				<LoginScreen>
