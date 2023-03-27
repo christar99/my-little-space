@@ -28,7 +28,7 @@ function Loading() {
 			alert('로그인 할 계정을 적어주세요!');
 		} else if (userName.length > 12) {
 			alert('계정은 12자 이내로 적어주세요!');
-		} else if (userName !== '') {
+		} else {
 			localStorage.setItem('account', JSON.stringify(account));
 			setLogin(JSON.stringify(account));
 		}

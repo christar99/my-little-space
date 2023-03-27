@@ -37,6 +37,8 @@ export default class document extends Document {
 						href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Nanum+Gothic&family=Nanum+Myeongjo&family=Nanum+Pen+Script&family=Noto+Serif+KR&family=Single+Day&display=swap"
 						rel="stylesheet"
 					/>
+					<link rel="shortcut icon" href="/favicon/favicon-32x32.png" />
+					<title>MY_LITTLE_SPACE</title>
 				</Head>
 				<body>
 					<Main />
