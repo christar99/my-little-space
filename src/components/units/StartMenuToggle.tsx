@@ -270,5 +270,5 @@ const Program = styled.div`
 
 const ProgramName = styled.span`
 	font-size: 1.7rem;
-	color: ${(props) => props.theme.startMenu.confirmButton};
+	color: ${(props) => props.theme.startMenu.searchInputText};
 `;
