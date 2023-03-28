@@ -13,6 +13,7 @@ import Login from 'components/units/Login';
 import StartMenu from 'components/units/StartMenu';
 import WallpaperIcons from 'components/units/WallpaperIcons';
 import Programs from 'components/units/Programs';
+import Head from 'next/head';
 
 export default function Viewport() {
 	const [notUse, setToggleOn] = useAtom(startMenuToggle);
@@ -46,6 +47,9 @@ export default function Viewport() {
 
 	return (
 		<ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+			<Head>
+				<title>MY LITTLE SPACE</title>
+			</Head>
 			{account.uuid === '' ? (
 				<Login />
 			) : (
