@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, DragEvent } from 'react';
+import React, { useState, useMemo, useEffect, MouseEvent } from 'react';
 import Image from 'next/image';
 import { useAtom } from 'jotai';
 import { accountAtom } from 'store';
@@ -14,7 +14,8 @@ function Loading() {
 	const [notUse, setLogin] = useAtom(accountAtom);
 	const [userName, setUserName] = useState<string>('');
 	const [onLoginScreen, setLoginScreen] = useState<boolean>(false);
-	const handleDragScreen = (e: DragEvent<HTMLDivElement>) => {
+
+	const handleClickScreen = (e: MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setLoginScreen(true);
 	};
@@ -45,7 +46,7 @@ function Loading() {
 	};
 
 	return (
-		<LoadingScreen draggable={true} onDragEnd={(e) => handleDragScreen(e)}>
+		<LoadingScreen onClick={(e) => handleClickScreen(e)}>
 			{!onLoginScreen ? (
 				<Date>
 					<CurrentTime>{timeSet.time}</CurrentTime>
