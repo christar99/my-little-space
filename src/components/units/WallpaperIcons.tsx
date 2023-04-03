@@ -226,6 +226,9 @@ export default function WallpaperIcons() {
 	};
 
 	const handleDragStart = (e: MouseEvent<HTMLDivElement>) => {
+		if (e.target !== e.currentTarget) {
+			return;
+		}
 		setDragPosition({
 			status: 'on',
 			position: [e.clientY, e.clientX],
@@ -234,6 +237,9 @@ export default function WallpaperIcons() {
 	};
 
 	const onDrag = (e: MouseEvent<HTMLDivElement>) => {
+		if (e.target !== e.currentTarget) {
+			return;
+		}
 		if (dragPosition.status === 'on' && e.clientX !== 0 && e.clientY !== 0) {
 			setDragPosition({
 				status: 'on',

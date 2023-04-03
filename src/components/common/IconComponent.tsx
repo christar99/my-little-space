@@ -50,6 +50,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		}
 	};
 	const dragProgram = (e: MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation();
 		const destination = document.elementFromPoint(e.clientX, e.clientY);
 		const folderName = destination?.getAttribute('data-name') as string;
 		const dataType = destination?.getAttribute('data-type');
@@ -151,6 +152,9 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 	};
 
 	const moveToDeskTop = () => {
+		if (icon.from === 'desktop') {
+			return;
+		}
 		const folderObj = iconList.find((program) => program.name === icon.from);
 		const cloneFolder = structuredClone(folderObj) as iconType;
 		if (cloneFolder?.containIcons !== undefined) {
