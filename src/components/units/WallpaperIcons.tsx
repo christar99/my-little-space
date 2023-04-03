@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, MouseEvent } from 'react';
 import { useAtom } from 'jotai';
 import styled from 'styled-components';
 import {
@@ -32,6 +32,11 @@ export default function WallpaperIcons() {
 	const [background, setBackground] = useAtom(backgroundAtom);
 	const [notuse3, setScreenShot] = useAtom(screenShotAtom);
 	const [resolution] = useAtom(setResolutionAtom);
+	const [dragPosition, setDragPosition] = useState({
+		status: 'off',
+		position: [0, 0],
+		size: [0, 0]
+	});
 
 	useEffect(() => {
 		const savedBackground = localStorage.getItem('background');
@@ -220,16 +225,50 @@ export default function WallpaperIcons() {
 		setOpenStartMenu(false);
 	};
 
+	const handleDragStart = (e: MouseEvent<HTMLDivElement>) => {
+		setDragPosition({
+			status: 'on',
+			position: [e.clientY, e.clientX],
+			size: [0, 0]
+		});
+	};
+
+	const onDrag = (e: MouseEvent<HTMLDivElement>) => {
+		if (dragPosition.status === 'on' && e.clientX !== 0 && e.clientY !== 0) {
+			setDragPosition({
+				status: 'on',
+				position: [dragPosition.position[0], dragPosition.position[1]],
+				size: [e.clientX - dragPosition.position[1], e.clientY - dragPosition.position[0]]
+			});
+		}
+	};
+
+	const handleDragEnd = () => {
+		setDragPosition({
+			status: 'off',
+			position: [0, 0],
+			size: [0, 0]
+		});
+	};
+
 	return (
 		<Desktop
 			ref={desktopRef}
 			background={background}
+			onMouseDown={(e) => handleDragStart(e)}
+			onMouseMove={(e) => onDrag(e)}
+			onMouseUp={handleDragEnd}
 			onClick={handleClickIcon}
 			data-type={'desktop'}
 			resolution={resolution}>
 			{icons.map((icon, index) => {
 				return <IconComponent key={index} icon={icon} from="wallpaper" />;
 			})}
+			<WallpaperDrag
+				display={dragPosition.status}
+				position={dragPosition.position}
+				size={dragPosition.size}
+			/>
 		</Desktop>
 	);
 }
@@ -251,4 +290,15 @@ const Desktop = styled.div<{ background: backgroundType; resolution: number }>`
 			: `url(${props.background.value})`};
 	background-position: center center;
 	background-repeat: no-repeat;
+`;
+
+const WallpaperDrag = styled.div<{ display: string; position: number[]; size: number[] }>`
+	display: ${(props) => (props.display === 'on' ? 'block' : 'none')};
+	width: ${(props) => props.size[0] + 'px'};
+	height: ${(props) => props.size[1] + 'px'};
+	position: absolute;
+	top: ${(props) => props.position[0] + 'px'};
+	left: ${(props) => props.position[1] + 'px'};
+	border: 1px dashed purple;
+	background-color: #3b5998;
 `;
