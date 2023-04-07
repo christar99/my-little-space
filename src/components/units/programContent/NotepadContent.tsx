@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, MouseEvent, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
+import { accountAtom, setResolutionAtom } from 'store';
 import { addIconList } from 'store/icons';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { fontStyleProps, programType } from 'utils/type';
 import { removeCookie } from 'utils/Cookie';
 import { S3PutObject } from 'utils/aws';
-import { fontStyle, uuid } from 'utils/common';
+import { fontStyle } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
-import { setResolutionAtom } from 'store';
 
 interface NotepadContentProps {
 	program: programType;
@@ -26,6 +26,7 @@ const settingValue: signitureIndexProps = {
 };
 
 function NotepadContent({ program }: NotepadContentProps) {
+	const [account] = useAtom(accountAtom);
 	const { notepadContent } = program;
 	const [zIndex] = useAtom(changeZIndex);
 	const [dropDownMenu, setDropDownMenu] = useState<string | null>(null);
@@ -108,7 +109,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 				return;
 			}
 
-			const uploadKey = `${uuid}/notepad/_${selectFontStyle.name}_${fontSize}_${filenameValue}.txt`;
+			const uploadKey = `${account.uuid}/notepad/_${selectFontStyle.name}_${fontSize}_${filenameValue}.txt`;
 			const file = new Blob([textValue], {
 				type: 'text/plain'
 			});

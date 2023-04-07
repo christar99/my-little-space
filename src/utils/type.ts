@@ -91,3 +91,8 @@ export interface fontStyleProps {
 	name: string;
 	value: string[];
 }
+
+export interface accountProps {
+	name: string;
+	uuid: string;
+}

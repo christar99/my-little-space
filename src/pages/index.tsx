@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { useAtom } from 'jotai';
 import {
-	needAccount,
+	accountAtom,
 	setDarkModeAtom,
 	setFontStyleAtom,
 	setResolutionAtom,
@@ -15,10 +15,10 @@ import WallpaperIcons from 'components/units/WallpaperIcons';
 import Programs from 'components/units/Programs';
 
 export default function Viewport() {
-	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
-	const [account, setLogin] = useAtom(needAccount);
+	const [notUse, setToggleOn] = useAtom(startMenuToggle);
+	const [account, setLogin] = useAtom(accountAtom);
 	const [darkMode, setDarkMode] = useAtom(setDarkModeAtom);
-	const [notUse, setResolution] = useAtom(setResolutionAtom);
+	const [notUse2, setResolution] = useAtom(setResolutionAtom);
 	const [fontFamily, setFontStyle] = useAtom(setFontStyleAtom);
 
 	const handleToggle = () => {
@@ -31,7 +31,7 @@ export default function Viewport() {
 		const resolution = localStorage.getItem('resolution');
 		const fontStyle = localStorage.getItem('fontStyle');
 		if (loginAccount !== null) {
-			setLogin(loginAccount);
+			setLogin(JSON.parse(loginAccount));
 		}
 		if (isDarkMode) {
 			setDarkMode(isDarkMode);
@@ -46,7 +46,7 @@ export default function Viewport() {
 
 	return (
 		<ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-			{account === null ? (
+			{account.uuid === '' ? (
 				<Login />
 			) : (
 				<Screen fontFamily={fontFamily.value[0] + ', ' + fontFamily.value[1]}>

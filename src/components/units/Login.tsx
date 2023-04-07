@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, DragEvent } from 'react';
 import Image from 'next/image';
 import { useAtom } from 'jotai';
-import { needAccount } from 'store';
+import { accountAtom } from 'store';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
@@ -11,7 +11,7 @@ dayjs.locale('ko');
 
 function Loading() {
 	const [currentTime, setCurrentTime] = useState<dayjs.Dayjs>();
-	const [isLogin, setLogin] = useAtom(needAccount);
+	const [notUse, setLogin] = useAtom(accountAtom);
 	const [userName, setUserName] = useState<string>('');
 	const [onLoginScreen, setLoginScreen] = useState<boolean>(false);
 	const handleDragScreen = (e: DragEvent<HTMLDivElement>) => {
@@ -40,7 +40,7 @@ function Loading() {
 			alert('계정은 12자 이내로 적어주세요!');
 		} else {
 			localStorage.setItem('account', JSON.stringify(account));
-			setLogin(JSON.stringify(account));
+			setLogin(account);
 		}
 	};
 

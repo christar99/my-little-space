@@ -2,14 +2,15 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { backgroundAtom, screenShotAtom } from 'store';
+import { accountAtom, backgroundAtom, screenShotAtom } from 'store';
 import { exitProgram } from 'store/programs';
 import { removeCookie } from 'utils/Cookie';
-import { colors, uuid } from 'utils/common';
+import { colors } from 'utils/common';
 import { S3PutObject, S3DeleteObject } from 'utils/aws';
 import { BsCheck } from 'react-icons/bs';
 
 export default function BackgroundSetting() {
+	const [account] = useAtom(accountAtom);
 	const [programList, closeProgram] = useAtom(exitProgram);
 	const [type, setType] = useState<string>('color');
 	const [background, setBackground] = useAtom(backgroundAtom);
@@ -38,7 +39,7 @@ export default function BackgroundSetting() {
 			deletePreImg();
 			if (e.target.files !== null) {
 				const type = e.target.files[0].type.split('/')[1];
-				const uploadKey = `${uuid}/mls_background_${new Date().getTime()}.${type}`;
+				const uploadKey = `${account.uuid}/mls_background_${new Date().getTime()}.${type}`;
 				const imgSrc = `${
 					process.env.NEXT_PUBLIC_S3_DEFAULT_URL as string
 				}users/${uploadKey}`;

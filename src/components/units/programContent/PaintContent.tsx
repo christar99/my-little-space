@@ -2,12 +2,13 @@ import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState, useCallbac
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
+import { accountAtom } from 'store';
 import { addIconList } from 'store/icons';
 import { changeZIndex, exitProgram } from 'store/programs';
 import { programType } from 'utils/type';
 import { S3PutObject } from 'utils/aws';
 import { removeCookie } from 'utils/Cookie';
-import { colors, uuid } from 'utils/common';
+import { colors } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineClose } from 'react-icons/ai';
 
@@ -16,6 +17,7 @@ interface PaintContentProps {
 }
 
 function PaintContent({ program }: PaintContentProps) {
+	const [account] = useAtom(accountAtom);
 	const { style } = program;
 	const { width, height, left, top } = style;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -151,7 +153,7 @@ function PaintContent({ program }: PaintContentProps) {
 
 		try {
 			if (canvasRef.current !== null) {
-				const uploadKey = `${uuid}/image/${fileName}.png`;
+				const uploadKey = `${account.uuid}/image/${fileName}.png`;
 				canvasRef.current.toBlob((blob) => {
 					if (blob !== null) {
 						S3PutObject(blob, uploadKey, 'image/png');

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, MouseEvent, useMemo } from 'react';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
-import { startMenuToggle } from 'store';
+import { accountAtom, startMenuToggle } from 'store';
 import { addIconList } from 'store/icons';
 import { changeZIndex, executeProgram, updateProgram } from 'store/programs';
-import { uuid } from 'utils/common';
 import { S3PutObject } from 'utils/aws';
 import { allCookie, setCookie } from 'utils/Cookie';
 import { iconType, programType } from 'utils/type';
@@ -12,13 +12,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { FiPower } from 'react-icons/fi';
 import { SlSettings } from 'react-icons/sl';
 import { IoDocumentOutline } from 'react-icons/io5';
-import Image from 'next/image';
 
 interface StartMenuToggleProps {
 	searchValue: string;
 }
 
 export default function StartMenuToggle({ searchValue }: StartMenuToggleProps) {
+	const [account] = useAtom(accountAtom);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [programList, changeProgram] = useAtom(updateProgram);
 	const [iconList, addNewIcon] = useAtom(addIconList);
@@ -96,7 +96,7 @@ export default function StartMenuToggle({ searchValue }: StartMenuToggleProps) {
 			return;
 		}
 
-		const uploadKey = `${uuid}/document/${newFolderName}.json`;
+		const uploadKey = `${account.uuid}/document/${newFolderName}.json`;
 		const bytes = new TextEncoder().encode('[]');
 		const file = new Blob([bytes], {
 			type: 'application/json'

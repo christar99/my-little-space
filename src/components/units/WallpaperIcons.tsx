@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import styled from 'styled-components';
 import {
+	accountAtom,
 	backgroundAtom,
 	screenShotAtom,
 	selectedIcon,
@@ -13,14 +14,15 @@ import { executeProgram, changeZIndex } from 'store/programs';
 import { backgroundType, iconType, ListObjectProps } from 'utils/type';
 import { S3ListObject, S3GetObject } from 'utils/aws';
 import { allCookie } from 'utils/Cookie';
-import { fetchURL, uuid } from 'utils/common';
+import { fetchURL } from 'utils/common';
 import { v4 as uuidv4 } from 'uuid';
 import IconComponent from 'components/common/IconComponent';
 import { _Object } from '@aws-sdk/client-s3';
 import html2canvas from 'html2canvas';
 
 export default function WallpaperIcons() {
-	const [openStartMenu, setOpenStartMenu] = useAtom(startMenuToggle);
+	const [account] = useAtom(accountAtom);
+	const [notuse4, setOpenStartMenu] = useAtom(startMenuToggle);
 	const [icons, addNewIcon] = useAtom(addIconList);
 	const [notuse, startProgram] = useAtom(executeProgram);
 	const [notuse2, setSelected] = useAtom(selectedIcon);
@@ -66,8 +68,7 @@ export default function WallpaperIcons() {
 	};
 
 	const getS3Objects = useCallback(async () => {
-		await S3ListObject(uuid);
-		const s3Objects = await S3ListObject(uuid);
+		const s3Objects = await S3ListObject(account.uuid);
 		const { textFile, imageFile, folders, background } = s3Objects;
 
 		if (background !== undefined) {
@@ -82,7 +83,7 @@ export default function WallpaperIcons() {
 			textFileList = await createTextFile(cookies, textFile, folderList.allDocumentFile);
 		}
 		if (imageFileList.length > 0) {
-			imageFileList = await createImageFile(cookies, imageFile, folderList.allDocumentFile);
+			imageFileList = createImageFile(cookies, imageFile, folderList.allDocumentFile);
 		}
 
 		addNewIcon([...folderList.document, ...textFileList, ...imageFileList]);

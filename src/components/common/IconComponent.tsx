@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, MouseEvent } from 'react';
+import React, { useMemo, MouseEvent } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import {
+	accountAtom,
 	backgroundAtom,
 	selectedIcon,
 	setDarkModeAtom,
@@ -14,7 +15,6 @@ import { changeZIndex, executeProgram, exitProgram } from 'store/programs';
 import { allCookie, removeCookie, setCookie } from 'utils/Cookie';
 import { iconType } from 'utils/type';
 import { S3DeleteObject, S3PutObject } from 'utils/aws';
-import { uuid } from 'utils/common';
 
 interface IconCompoentnProps {
 	icon: iconType;
@@ -22,6 +22,7 @@ interface IconCompoentnProps {
 }
 
 export default function IconComponent({ icon, from }: IconCompoentnProps) {
+	const [account] = useAtom(accountAtom);
 	const [selected, setSelected] = useAtom(selectedIcon);
 	const [notUse, setOpenStartMenu] = useAtom(startMenuToggle);
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
@@ -99,7 +100,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 			removeCookie(iconObj.uuid);
 			closeProgram(selectProgram);
 		}
-		const key = { Key: `users/${uuid}/${iconObj.type}/${deleteIconName}` };
+		const key = { Key: `users/${account?.uuid}/${iconObj.type}/${deleteIconName}` };
 		deleteProgram(iconObj);
 
 		return key;
@@ -137,7 +138,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		const bytes = new TextEncoder().encode(containIconStr);
 		const cloneFolderName = cloneFolder.name;
 
-		const uploadKey = `${uuid}/document/${cloneFolderName}.json`;
+		const uploadKey = `${account?.uuid}/document/${cloneFolderName}.json`;
 		const file = new Blob([bytes], {
 			type: 'application/json'
 		});

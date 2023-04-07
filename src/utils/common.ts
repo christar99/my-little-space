@@ -1,9 +1,5 @@
 import { fontStyleProps } from './type';
 
-const account =
-	typeof window === 'undefined' ? undefined : (window.localStorage.getItem('account') as string);
-export const uuid = account === null || account === undefined ? '' : JSON.parse(account).uuid;
-
 export const fetchURL = async (url: string) => {
 	try {
 		const fetchResponse = await fetch(url);

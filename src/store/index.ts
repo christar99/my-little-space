@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
-import { backgroundType, fontStyleProps } from 'utils/type';
+import { accountProps, backgroundType, fontStyleProps } from 'utils/type';
 
-export const needAccount = atom<string | null>(null);
+export const accountAtom = atom<accountProps>({ name: '', uuid: '' });
 export const startMenuToggle = atom<boolean>(false);
 
 const selected = atom<string>('');
