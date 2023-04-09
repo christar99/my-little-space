@@ -9,6 +9,7 @@ import BackgroundSetting from 'components/units/programContent/BackgroundSetting
 import ThemeSetting from 'components/units/programContent/ThemeSetting';
 import { setResolutionAtom } from 'store';
 import { useAtom } from 'jotai';
+import TrashContent from 'components/units/programContent/TrashContent';
 
 interface ProgramContentProps {
 	program: programType;
@@ -24,6 +25,7 @@ function ProgramContent({ program }: ProgramContentProps) {
 			{program.type === 'document' && <DocumentContent program={program} />}
 			{program.name === '배경화면 설정' && <BackgroundSetting />}
 			{program.name === '테마 설정' && <ThemeSetting />}
+			{program.type === 'trash' && <TrashContent />}
 		</ProgramBackground>
 	);
 }

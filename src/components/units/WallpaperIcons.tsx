@@ -115,7 +115,7 @@ export default function WallpaperIcons() {
 				uuid: existenceFile === undefined ? uuidv4() : existenceFile[0],
 				image: '/icons/newFolder.png',
 				type: 'document',
-				from: 'desktop',
+				from: '바탕화면',
 				containIcons: documentFetch[index]
 			};
 			document.push(documentContent);
@@ -157,7 +157,7 @@ export default function WallpaperIcons() {
 				uuid: existenceFile === undefined ? uuidv4() : existenceFile[0],
 				image: '/icons/notepad.png',
 				type: 'notepad',
-				from: 'desktop',
+				from: '바탕화면',
 				notepadContent: {
 					content: textFileContent[index] as string,
 					fontSize: Number(option.fontSize),
@@ -185,7 +185,7 @@ export default function WallpaperIcons() {
 				uuid: existenceFile === undefined ? uuidv4() : existenceFile[0],
 				image: '/icons/window_image.png',
 				type: 'image',
-				from: 'desktop',
+				from: '바탕화면',
 				src: (process.env.NEXT_PUBLIC_S3_DEFAULT_URL as string) + img.Key
 			};
 			if (allDocumentFile.find((file) => file.name === imgFile.name) === undefined) {
@@ -265,7 +265,7 @@ export default function WallpaperIcons() {
 			onMouseMove={(e) => onDrag(e)}
 			onMouseUp={handleDragEnd}
 			onClick={handleClickIcon}
-			data-type={'desktop'}
+			data-type={'바탕화면'}
 			resolution={resolution}>
 			{icons.map((icon, index) => {
 				return <IconComponent key={index} icon={icon} from="wallpaper" />;

@@ -166,7 +166,7 @@ function PaintContent({ program }: PaintContentProps) {
 						uuid: uuidv4(),
 						image: '/icons/window_image.png',
 						type: 'image',
-						from: 'desktop',
+						from: '바탕화면',
 						src:
 							(process.env.NEXT_PUBLIC_S3_DEFAULT_URL as string) +
 							'users/' +

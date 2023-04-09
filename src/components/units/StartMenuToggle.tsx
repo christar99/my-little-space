@@ -109,7 +109,7 @@ export default function StartMenuToggle({ searchValue }: StartMenuToggleProps) {
 				uuid: uuidv4(),
 				image: '/icons/newFolder.png',
 				type: 'document',
-				from: 'desktop'
+				from: '바탕화면'
 			}
 		]);
 		handleToggle();

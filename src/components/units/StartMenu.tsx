@@ -226,8 +226,10 @@ const TimeContainer = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	gap: 3px;
 	color: ${(props) => props.theme.startMenu.searchInputText};
-	font-size: 1.5rem;
+	font-size: 1.2rem;
+	user-select: none;
 `;
 
 const TimeSet = styled.div``;

@@ -56,11 +56,11 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		const dataType = destination?.getAttribute('data-type');
 		const folderIcon = iconList.find((item) => item.name === folderName) as iconType;
 
-		if (dataType === 'trash_can') {
+		if (dataType === 'trash') {
 			handleDeleteProgram();
 		} else if (dataType === 'document') {
 			moveToDocument(folderName, folderIcon);
-		} else if (dataType === 'desktop' && folderIcon === undefined) {
+		} else if (dataType === '바탕화면' && folderIcon === undefined) {
 			moveToDeskTop();
 		}
 	};
@@ -152,7 +152,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 	};
 
 	const moveToDeskTop = () => {
-		if (icon.from === 'desktop') {
+		if (icon.from === '바탕화면') {
 			return;
 		}
 		const folderObj = iconList.find((program) => program.name === icon.from);
@@ -170,7 +170,7 @@ export default function IconComponent({ icon, from }: IconCompoentnProps) {
 		addNewIcon([
 			{
 				...cloneIcon,
-				from: 'desktop'
+				from: '바탕화면'
 			}
 		]);
 	};

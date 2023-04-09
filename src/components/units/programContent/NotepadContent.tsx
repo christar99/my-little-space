@@ -121,7 +121,7 @@ function NotepadContent({ program }: NotepadContentProps) {
 					uuid: uuidv4(),
 					image: '/icons/notepad.png',
 					type: 'notepad',
-					from: 'desktop',
+					from: '바탕화면',
 					notepadContent: {
 						content: textValue,
 						fontSize,
