@@ -1,13 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import { startMenuToggle } from 'store';
 import { changeZIndex, memorizeProgramStyle, updateProgram } from 'store/programs';
 import { programType } from 'utils/type';
-
+import StartMenuToggle from 'components/units/StartMenuToggle';
 import { VscSearch } from 'react-icons/vsc';
-import StartMenuToggle from './StartMenuToggle';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+
+dayjs.locale('ko');
 
 function StartMenu() {
 	const [toggleOn, setToggleOn] = useAtom(startMenuToggle);
@@ -15,6 +18,7 @@ function StartMenu() {
 	const [zIndex, setBigZIndex] = useAtom(changeZIndex);
 	const [memorizeList, memorizeProgram] = useAtom(memorizeProgramStyle);
 	const [searchValue, setSearch] = useState<string>('');
+	const [currentTime, setCurrentTime] = useState<dayjs.Dayjs>();
 
 	const topProgram = useMemo(() => {
 		let result = programList[0];
@@ -25,6 +29,18 @@ function StartMenu() {
 		}
 		return result;
 	}, [programList]);
+
+	const timeSet = useMemo(() => {
+		const amPm = Number(currentTime?.format('HH')) < 12 ? '오전 ' : '오후 ';
+		const time = amPm + currentTime?.format('HH:mm');
+		const date = currentTime?.format('YYYY-MM-DD');
+
+		return { time, date };
+	}, [currentTime]);
+
+	useEffect(() => {
+		setCurrentTime(dayjs());
+	}, []);
 
 	const handleToggle = () => {
 		setToggleOn(!toggleOn);
@@ -63,29 +79,40 @@ function StartMenu() {
 
 	return (
 		<MenuContainer>
-			<StartMenuButton onClick={handleToggle}>
-				<ButtonImage />
-			</StartMenuButton>
+			<MainContainer>
+				<StartMenuButton onClick={handleToggle}>
+					<ButtonImage />
+				</StartMenuButton>
 
-			<SearchInputContainer onClick={handleToggle}>
-				<SearchInput onChange={(e) => setSearch(e.target.value)} placeholder="찾기" />
-				<VscSearch />
-			</SearchInputContainer>
-			<RunningProgram>
-				{programList.map((program, index) => {
-					return (
-						<ProgmamIcon
-							key={index}
-							onClick={() => handleExecuteProgram(program)}
-							topProgram={
-								!program.style.minimization && topProgram.name === program.name
-							}>
-							<Image src={program.image} width={25} height={25} alt="program icon" />
-						</ProgmamIcon>
-					);
-				})}
-			</RunningProgram>
-			{toggleOn && <StartMenuToggle searchValue={searchValue} />}
+				<SearchInputContainer onClick={handleToggle}>
+					<SearchInput onChange={(e) => setSearch(e.target.value)} placeholder="찾기" />
+					<VscSearch />
+				</SearchInputContainer>
+				<RunningProgram>
+					{programList.map((program, index) => {
+						return (
+							<ProgmamIcon
+								key={index}
+								onClick={() => handleExecuteProgram(program)}
+								topProgram={
+									!program.style.minimization && topProgram.name === program.name
+								}>
+								<Image
+									src={program.image}
+									width={25}
+									height={25}
+									alt="program icon"
+								/>
+							</ProgmamIcon>
+						);
+					})}
+				</RunningProgram>
+				{toggleOn && <StartMenuToggle searchValue={searchValue} />}
+			</MainContainer>
+			<TimeContainer>
+				<TimeSet>{timeSet.time}</TimeSet>
+				<DateSet>{timeSet.date}</DateSet>
+			</TimeContainer>
 		</MenuContainer>
 	);
 }
@@ -97,6 +124,11 @@ const MenuContainer = styled.div`
 	position: absolute;
 	bottom: 0;
 	z-index: 101;
+	display: flex;
+	justify-content: space-between;
+`;
+
+const MainContainer = styled.div`
 	display: flex;
 `;
 
@@ -186,5 +218,20 @@ const ProgmamIcon = styled.div<{ topProgram: boolean }>`
 		cursor: pointer;
 	}
 `;
+
+const TimeContainer = styled.div`
+	height: 100%;
+	margin-right: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: ${(props) => props.theme.startMenu.searchInputText};
+	font-size: 1.5rem;
+`;
+
+const TimeSet = styled.div``;
+
+const DateSet = styled.div``;
 
 export default StartMenu;
